@@ -4,10 +4,7 @@ library(tidyverse)
 library(dplyr)
 library(ggthemes)
 
-initial <- read.csv("data/airqedited.csv")
-noHighIncome <- read.csv("data/airq-no-high-income.csv")
-noMediumIncome <- read.csv("data/airq-no-medium-income.csv")
-noOutliers <- read.csv("data/airq-no-outliers.csv")
+initial <- read_csv("data/airqedited.csv")
 
 randX1 <- runif(1, min = 3000, max=6000) # x value for mid income outlier
 randX2 <- runif(1, min = 8000, max= 10000) # x value for first high income outlier
@@ -17,11 +14,12 @@ randY2 <- runif(1, min = 14000, max = 17000)
 randY3 <- runif(1, min = 14000, max = 17000)
 
 determiner <- runif(1, min = 0, max = 1)
-ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 1200,
-                                        randY1 <- runif(1, min = 6000, max = 10000)))
+ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 1200),
+                                        randY1 <- runif(1, min = 6000, max = 10000))
 
-
-    
+rbind(initial, list(0, randX1, 0, "", 0, randY1))
+rbind(initial, list(0, randX2, 0, "", 0, randY2))
+rbind(initial, list(0, randX3, 0, "", 0, randY3))
 
 # Define UI for application
 ui <- fluidPage(
