@@ -9,6 +9,20 @@ noHighIncome <- read.csv("data/airq-no-high-income.csv")
 noMediumIncome <- read.csv("data/airq-no-medium-income.csv")
 noOutliers <- read.csv("data/airq-no-outliers.csv")
 
+randX1 <- runif(1, min = 3000, max=6000) # x value for mid income outlier
+randX2 <- runif(1, min = 8000, max= 10000) # x value for first high income outlier
+randX3 <- runif(1, min = 8000, max= 10000) # x value for second high income outlier
+randY1 <- 0
+randY2 <- runif(1, min = 14000, max = 17000)
+randY3 <- runif(1, min = 14000, max = 17000)
+
+determiner <- runif(1, min = 0, max = 1)
+ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 1200,
+                                        randY1 <- runif(1, min = 6000, max = 10000)))
+
+
+    
+
 # Define UI for application
 ui <- fluidPage(
     titlePanel("How to Identify and Deal with Outliers"),
