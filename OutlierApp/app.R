@@ -2,6 +2,8 @@
 library(shiny)
 library(tidyverse)
 library(dplyr)
+library(knitr)
+library(broom)
 library(ggthemes)
 
 initial <- read_csv("data/airq-no-outliers.csv")
@@ -65,7 +67,8 @@ ui <- fluidPage(
                             ),
                             # Show a plot of the generated model
                             mainPanel(
-                                plotOutput("outlierGraph")
+                                plotOutput("outlierGraph"),
+                                verbatimTextOutput("outlierModel")
                             )
                         ) 
                ), #end of second tab
@@ -120,6 +123,13 @@ server <- function(input, output) {
                  x = "Median Household Income", y = "Business Value Added") + 
             geom_smooth(method = "lm", se = FALSE)
 
+    })
+    
+    output$outlierModel <- renderPrint({
+    tab2Model <- lm(vala ~ medi, data = initial)
+    tab2Model %>%
+        tidy(conf.int = TRUE) %>%
+        kable(format = "markdown", digits = 3)
     })
     
     output$originalGraph <- renderPlot({
