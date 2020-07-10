@@ -6,27 +6,23 @@ library(ggthemes)
 
 initial <- read_csv("data/airq-no-outliers.csv")
 
-randX1 <- runif(1, min = 3000, max=6000) # x value for mid income outlier
-randX2 <- runif(1, min = 8000, max= 10000) # x value for first high income outlier
-randX3 <- runif(1, min = 8000, max= 10000) # x value for second high income outlier
+randX1 <- runif(1, min = 5000, max=6000) # x value for mid income outlier
+randX2 <- runif(1, min = 10000, max= 11500) # x value for first high income outlier
+randX3 <- runif(1, min = 10000, max= 11500) # x value for second high income outlier
 randY1 <- 0
-randY2 <- runif(1, min = 14000, max = 17000)
-randY3 <- runif(1, min = 14000, max = 17000)
+randY2 <- runif(1, min = 12000, max = 14000)
+randY3 <- runif(1, min = 11000, max = 13000)
 
 determiner <- runif(1, min = 0, max = 1)
-ifelse (determiner<0.5, randY1 <- runif(1, min = 0, max = 200),
+ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 300),
                                         randY1 <- runif(1, min = 6000, max = 10000))
 
-vector_1 <- c(2, 0, randX1, 0, "", 0, randY1)
-vector_2 <- c(3, 0, randX2, 0, "", 0, randY2)
-vector_3 <- c(4, 0, randX3, 0, "", 0, randY3)
+df1 = data.frame(X = c(2:4), airq = c(rep(0, 3)), vala = c(randY1, randY2, randY3), 
+                 rain = c(rep(0, 3)), coas = c(rep("", 3)), dens = c(rep(0, 3)),
+                 medi = c(randX1, randX2, randX3)) # Create data frame from random outliers
 
-randX1
-rbind(initial, vector_1, sep = ",")
-rbind(initial, vector_2)
-rbind(initial, vector_3)
+new_data = rbind(initial, df1)
 
-View(initial)
 # Define UI for application
 ui <- fluidPage(
     titlePanel("How to Identify and Deal with Outliers"),
@@ -115,7 +111,7 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$outlierGraph <- renderPlot({
-        ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
+        ggplot(data=new_data, aes(x=medi, y=vala)) + geom_point() + 
             labs(title = "Business Value Added vs. Median Income",
                  x = "Median Household Income", y = "Business Value Added") + 
             geom_smooth(method = "lm", se = FALSE)
