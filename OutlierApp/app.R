@@ -4,7 +4,7 @@ library(tidyverse)
 library(dplyr)
 library(ggthemes)
 
-initial <- read_csv("data/airqedited.csv")
+initial <- read_csv("data/airq-no-outliers.csv")
 
 randX1 <- runif(1, min = 3000, max=6000) # x value for mid income outlier
 randX2 <- runif(1, min = 8000, max= 10000) # x value for first high income outlier
@@ -14,13 +14,19 @@ randY2 <- runif(1, min = 14000, max = 17000)
 randY3 <- runif(1, min = 14000, max = 17000)
 
 determiner <- runif(1, min = 0, max = 1)
-ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 1200),
+ifelse (determiner<0.5, randY1 <- runif(1, min = 0, max = 200),
                                         randY1 <- runif(1, min = 6000, max = 10000))
 
-rbind(initial, list(0, randX1, 0, "", 0, randY1))
-rbind(initial, list(0, randX2, 0, "", 0, randY2))
-rbind(initial, list(0, randX3, 0, "", 0, randY3))
+vector_1 <- c(2, 0, randX1, 0, "", 0, randY1)
+vector_2 <- c(3, 0, randX2, 0, "", 0, randY2)
+vector_3 <- c(4, 0, randX3, 0, "", 0, randY3)
 
+randX1
+rbind(initial, vector_1, sep = ",")
+rbind(initial, vector_2)
+rbind(initial, vector_3)
+
+View(initial)
 # Define UI for application
 ui <- fluidPage(
     titlePanel("How to Identify and Deal with Outliers"),
@@ -112,7 +118,7 @@ server <- function(input, output) {
         ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
             labs(title = "Business Value Added vs. Median Income",
                  x = "Median Household Income", y = "Business Value Added") + 
-            geom_smooth(method = "lm", se = FALSE) + theme_economist()
+            geom_smooth(method = "lm", se = FALSE)
         
         
     })
