@@ -97,7 +97,9 @@ ui <- fluidPage(
                                                      "Log Transform the Data" = "logTransform"))
                             ),
                             mainPanel(
-                                plotOutput("solutionsGraph")
+                                fluidRow(
+                                    splitLayout(cellWidths = c("50%", "50%"), plotOutput("originalGraph"), plotOutput("solutionsGraph"))
+                                )
                             )
                         )
                ), #end of fourth tab
@@ -116,7 +118,15 @@ server <- function(input, output) {
                  x = "Median Household Income", y = "Business Value Added") + 
             geom_smooth(method = "lm", se = FALSE)
         
-        
+    
+    output$originalGraph <- renderPlot({
+        # Code for original graph
+    })
+    
+    output$solutionsGraph <- renderPlot({
+        # Code for solutions graph
+    })
+    
     })
 }
 
