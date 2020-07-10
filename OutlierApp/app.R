@@ -130,31 +130,32 @@ server <- function(input, output) {
              x = "Median Household Income", y = "Business Value Added") + 
         geom_smooth(method = "lm", se = FALSE)
 
-    
+    # Initial plot to graph when session starts
 
     
     output$outlierGraph <- renderPlot({
-        if(is.null(input$remove)) {
+        if(is.null(input$remove)) { # When no checkboxes checked, change data frame to initialTab2
             g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE)
         }
-        if(length(input$remove) == 1) {
-            if (input$remove == "Middle Income Outlier") {
+        if(length(input$remove) == 1) { # When one checkbox checked
+            
+            if (input$remove == "Middle Income Outlier") { # When only remove Middle Income Outlier checked
                 g <- ggplot(data=noMedTab2, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
                     geom_smooth(method = "lm", se = FALSE)
             }
-            if(input$remove == "High Income Outliers") {
+            if(input$remove == "High Income Outliers") { #When only remove High Income Outliers is checked
                 g <- ggplot(data=noHighTab2, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE)
             }
         }
-        else if (length(input$remove == 2)){
+        else if (length(input$remove == 2)){ # When both checkboxes are checked, use initial dataframe
             g <- ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
