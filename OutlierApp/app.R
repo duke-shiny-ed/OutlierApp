@@ -23,10 +23,19 @@ df1 = data.frame(X = c(31:33), airq = c(rep(0, 3)), vala = c(randY1, randY2, ran
                  rain = c(rep(0, 3)), coas = c(rep("", 3)), dens = c(rep(0, 3)),
                  medi = c(randX1, randX2, randX3)) # Create data frame from random outliers
 
-initial <- rbind(initial, df1)
-initial <- initial[-c(24, 25, 26),]
+df2 = data.frame(X = 31, airq = 0, vala = randY1, 
+                 rain = 0, coas = "", dens = 0, 
+                 medi = randX1) # Create data frame for noHighTab2
 
-View(initial)
+df3 = data.frame(X = c(31, 32), airq = c(rep(0, 2)), vala = c(randY2, randY3), 
+                 rain = c(rep(0, 2)), coas = c(rep("", 2)), dens = c(rep(0, 2)), 
+                 medi = c(randX2, randX3)) # Create data frame for noMedTab2
+
+initialTab2 <- rbind(initial, df1)
+noHighTab2 <- rbind(initial, df2)
+noMedTab2 <- rbind(initial, df3)
+
+
 # Define UI for application
 ui <- fluidPage(
     titlePanel("How to Identify and Deal with Outliers"),
@@ -62,8 +71,8 @@ ui <- fluidPage(
                      Toggle the checkboxes below to remove some data points from the model."),
                                 checkboxGroupInput("remove",
                                                    "Click to remove:",
-                                                   c("Middle Income Outliers" = "mid2",
-                                                     "High Income Outliers" = "high2")),
+                                                   c("Middle Income Outlier",
+                                                     "High Income Outliers")),
                             ),
                             # Show a plot of the generated model
                             mainPanel(
@@ -116,21 +125,71 @@ ui <- fluidPage(
 
 # Define server logic required to draw model
 server <- function(input, output) {
+    g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
+        labs(title = "Business Value Added vs. Median Income",
+             x = "Median Household Income", y = "Business Value Added") + 
+        geom_smooth(method = "lm", se = FALSE)
+
+    
+
     
     output$outlierGraph <- renderPlot({
-        ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
-            labs(title = "Business Value Added vs. Median Income",
-                 x = "Median Household Income", y = "Business Value Added") + 
-            geom_smooth(method = "lm", se = FALSE)
+        if(is.null(input$remove)) {
+            g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
+                labs(title = "Business Value Added vs. Median Income",
+                     x = "Median Household Income", y = "Business Value Added") + 
+                geom_smooth(method = "lm", se = FALSE)
+        }
+        if(length(input$remove) == 1) {
+            if (input$remove == "Middle Income Outlier") {
+                g <- ggplot(data=noMedTab2, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE)
+            }
+            if(input$remove == "High Income Outliers") {
+                g <- ggplot(data=noHighTab2, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added")+ 
+                    geom_smooth(method = "lm", se = FALSE)
+            }
+        }
+        else if (length(input$remove == 2)){
+            g <- ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
+                labs(title = "Business Value Added vs. Median Income",
+                     x = "Median Household Income", y = "Business Value Added") + 
+                geom_smooth(method = "lm", se = FALSE)
+            
+        }
+        g
 
     })
+
     
     output$outlierModel <- renderPrint({
-    tab2Model <- lm(vala ~ medi, data = initial)
+    tab2Model <- lm(vala ~ medi, data = initialTab2)
+    
+    if(is.null(input$remove)) {
+        tab2Model <- lm(vala ~ medi, data = initialTab2)
+    }
+    if(length(input$remove) == 1) {
+        if (input$remove == "Middle Income Outlier") {
+            tab2Model <- lm(vala ~ medi, data = noMedTab2)
+        }
+        if(input$remove == "High Income Outliers") {
+            tab2Model <- lm(vala ~ medi, data = noHighTab2)
+        }
+    }
+    else if (length(input$remove == 2)){
+        tab2Model <- lm(vala ~ medi, data = initial)
+        
+    }
+    
     tab2Model %>%
         tidy(conf.int = TRUE) %>%
         kable(format = "markdown", digits = 3)
-    })
+   
+     })
     
     output$originalGraph <- renderPlot({
         # Code for original graph
