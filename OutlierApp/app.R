@@ -88,14 +88,16 @@ ui <- fluidPage(
                                 helpText("Toggle the radio buttons to learn how to calculate measures for outliers and what they mean."),
                                 radioButtons("measure",
                                              "Choose your measure:",
-                                             c("Cook's Distance" = "cooksDistance",
+                                             c("Leverage" = "leverage",
                                                "Standardized residuals" = "standardizedResiduals",
-                                               "Leverage" = "leverage"
-                                             ))
+                                               "Cook's Distance" = "cooksDistance"
+                                             )),
+                                textOutput("measureDefinition"),
+                                uiOutput("measureFormula")
                             ),
                             mainPanel(
                                 plotOutput("measureGraph"),
-                                textOutput("measureExplanation")
+                                textOutput("measureThresholds")
                             )
                         )
                ), #end of third tab
@@ -125,6 +127,8 @@ ui <- fluidPage(
 
 # Define server logic required to draw model
 server <- function(input, output) {
+
+#Start of tab 2 code
     g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
         labs(title = "Business Value Added vs. Median Income",
              x = "Median Household Income", y = "Business Value Added") + 
@@ -191,6 +195,49 @@ server <- function(input, output) {
         kable(format = "markdown", digits = 3)
    
      })
+
+# End of tab 2 code
+    
+# Start of tab 3 code
+
+#Code for measureDefinition below
+output$measureDefinition <- renderText({
+    definition = ""
+    if(input$measure == "leverage") {
+        definition = "Leverage is the measure of the distance between 
+        an observation's values of the predictor variables and the 
+        average values of the predictor variables for the whole data set. 
+        Formula below:"
+    }
+    
+    else if(input$measure == "standardizedResiduals") {
+        definition = "The standardized residual is the residual divided by 
+        the standard error. The residual is an observation's actual value minus 
+        the model's predicted value for that observation. Formula below:"
+    }
+    
+    else {
+        definition = "Cook's Distance is a measure of an observation's 
+        overall impact. It's the effect that removing the observation has on 
+        the estimated coefficients. Formula below:"
+    }
+    definition
+})
+
+# Code for measureFormula below
+formula = ""
+output$measureFormula <- renderUI({
+    if(input$measure == "leverage") {
+
+       formula <- "h_{i} = \frac{1}{n}\:+\:\frac{(x_{i}-x\bar{})^{2}}{\sum_{j=1}^{n}(x_{j}-x\bar{})^{2}}"
+}
+    else if(input$measure == "standardizedResiduals") {
+
+    }
+    formula
+    })
+
+
     
     output$originalGraph <- renderPlot({
         # Code for original graph
