@@ -15,13 +15,13 @@ randY3 <- runif(1, min = 11000, max = 13000)
 
 determiner <- runif(1, min = 0, max = 1)
 ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 300),
-                                        randY1 <- runif(1, min = 6000, max = 10000))
+                                        randY1 <- runif(1, min = 7000, max = 10000))
 
 df1 = data.frame(X = c(2:4), airq = c(rep(0, 3)), vala = c(randY1, randY2, randY3), 
                  rain = c(rep(0, 3)), coas = c(rep("", 3)), dens = c(rep(0, 3)),
                  medi = c(randX1, randX2, randX3)) # Create data frame from random outliers
 
-new_data = rbind(initial, df1)
+initial <- rbind(initial, df1)
 
 # Define UI for application
 ui <- fluidPage(
@@ -113,11 +113,12 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$outlierGraph <- renderPlot({
-        ggplot(data=new_data, aes(x=medi, y=vala)) + geom_point() + 
+        ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
             labs(title = "Business Value Added vs. Median Income",
                  x = "Median Household Income", y = "Business Value Added") + 
             geom_smooth(method = "lm", se = FALSE)
-        
+
+    })
     
     output$originalGraph <- renderPlot({
         # Code for original graph
@@ -125,8 +126,6 @@ server <- function(input, output) {
     
     output$solutionsGraph <- renderPlot({
         # Code for solutions graph
-    })
-    
     })
 }
 
