@@ -12,12 +12,12 @@ randX1 <- runif(1, min = 5000, max=6000) # x value for mid income outlier
 randX2 <- runif(1, min = 10000, max= 11500) # x value for first high income outlier
 randX3 <- runif(1, min = 10000, max= 11500) # x value for second high income outlier
 randY1 <- 0
-randY2 <- runif(1, min = 12000, max = 14000)
-randY3 <- runif(1, min = 11000, max = 13000)
+randY2 <- runif(1, min = 13000, max = 15000)
+randY3 <- runif(1, min = 12000, max = 15000)
 
 determiner <- runif(1, min = 0, max = 1)
-ifelse (determiner<0.5, randY1 <- runif(1, min = 100, max = 300),
-                                        randY1 <- runif(1, min = 7000, max = 10000))
+ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 150),
+                                        randY1 <- runif(1, min = 9000, max = 11000))
 
 df1 = data.frame(X = c(31:33), airq = c(rep(0, 3)), vala = c(randY1, randY2, randY3), 
                  rain = c(rep(0, 3)), coas = c(rep("", 3)), dens = c(rep(0, 3)),
@@ -35,7 +35,15 @@ initialTab2 <- rbind(initial, df1)
 noHighTab2 <- rbind(initial, df2)
 noMedTab2 <- rbind(initial, df3)
 
+# Create augmented data frame with predictions
+initialModel <- lm(vala ~ medi, data = initialTab2)
 
+initial_aug <- augment(initialModel) %>%
+    mutate(obs_num = row_number())
+
+
+leverageThresh = 2*(2 + 1) / nrow(initial_aug) # define leverage threshold
+print(nrow(initial_aug))
 # Define UI for application
 ui <- fluidPage(
     titlePanel("How to Identify and Deal with Outliers"),
@@ -52,11 +60,11 @@ ui <- fluidPage(
                         ),
                         fluidRow(
                             column(6,
-                                   h5("Identifying Outliers \n"),
+                                   h5("Identifying Outliers \n")
                                    
                             ),
                             column(6,
-                                   h5("Dealing with Outliers"),
+                                   h5("Dealing with Outliers")
                                    
                             )
                         ) #end of second row
@@ -142,7 +150,7 @@ server <- function(input, output) {
             g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE)
+                geom_smooth(method = "lm", se = FALSE) + theme_economist()
         }
         if(length(input$remove) == 1) { # When one checkbox checked
             
@@ -225,21 +233,63 @@ output$measureDefinition <- renderText({
 })
 
 # Code for measureFormula below
-# formula = ""
-# output$measureFormula <- renderUI({
-#     if(input$measure == "leverage") {
-# 
-#        formula <- "h_{i} = \frac{1}{n}\:+\:\frac{(x_{i}-x\bar{})^{2}}{\sum_{j=1}^{n}(x_{j}-x\bar{})^{2}}"
-# }
-#     else if(input$measure == "standardizedResiduals") {
-#         formula <- "std.\, res_{i} = \frac{y_{i}-y\widehat{}}{\sigma \widehat{}\sqrt{1-h_{i}}}"
-#     }
-#     else {
-#         formula <- ""
-#     }
-# withMathJax(formula)
-#     })
+formula = ''
+output$measureFormula <- renderUI({
+    if(input$measure == "leverage") {
+    withMathJax(
+       helpText('$h_{i} = \frac{1}{n}+\frac{(x_{i}-x\bar{})^{2}}{\\sum_{j=1}^{n}(x_{j}-x\bar{})^{2}}$'))
+}
+    else if(input$measure == "standardizedResiduals") {
+        formula = ''
+    }
+    else {
+        formula <- ''
+    }
+    
+withMathJax(formula)
+    })
 
+# Code for measureGraph below
+measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
+    geom_point() +
+    geom_hline(yintercept = leverageThresh, color = "red") +
+    labs(title = "Leverage by Observation",
+         x = "Observation Number",
+         y = "Leverage")
+
+    output$measureGraph <- renderPlot({
+        if(input$measure == "leverage") {
+            measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
+                geom_point() +
+                geom_hline(yintercept = leverageThresh, color = "red") +
+                labs(title = "Leverage by Observation",
+                     x = "Observation Number",
+                     y = "Leverage") + 
+                geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),""))) +
+                theme_economist()
+        }
+        if(input$measure == "standardizedResiduals") {
+            measurePlot <- ggplot(data = initial_aug, aes(x = .fitted, y = .std.resid)) +
+                geom_point() +
+                geom_hline(yintercept = -2, color = "red") +
+                geom_hline(yintercept = 2, color = "red") +
+                labs(title = "Standard Residuals vs. Predicted Value",
+                     x = "Predicted",
+                     y = "Standard Residuals") + 
+                geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ",as.character(obs_num)),""))) + 
+                theme_economist()
+        }
+        else if(input$measure == "cooksDistance"){
+            measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .cooksd)) +
+                geom_point(alpha = 0.7) +
+                geom_hline(yintercept=1,color = "red") +
+                labs(x = "Observation Number", y = "Cook's Distance", title = "Cook's Distance") + 
+                geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),""))) + 
+                theme_economist()
+        }
+        
+        measurePlot
+    })
 
     
     output$originalGraph <- renderPlot({
