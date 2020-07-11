@@ -158,20 +158,23 @@ server <- function(input, output) {
                 g <- ggplot(data=noMedTab2, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
-                    geom_smooth(method = "lm", se = FALSE)
+                    geom_smooth(method = "lm", se = FALSE) + 
+                    theme_economist()
             }
             if(input$remove == "High Income Outliers") { #When only remove High Income Outliers is checked
                 g <- ggplot(data=noHighTab2, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
-                    geom_smooth(method = "lm", se = FALSE)
+                    geom_smooth(method = "lm", se = FALSE) + 
+                    theme_economist()
             }
         }
         else if (length(input$remove == 2)){ # When both checkboxes are checked, use initial dataframe
             g <- ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE)
+                geom_smooth(method = "lm", se = FALSE) + 
+                theme_economist()
             
         }
         g
