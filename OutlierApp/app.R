@@ -8,11 +8,12 @@ library(ggthemes)
 library(RColorBrewer)
 
 initial <- read_csv("data/airq-no-outliers.csv")
+initial$outlier <- c(rep("no", 23))
 
 randX1 <- runif(1, min = 5000, max=6000) # x value for mid income outlier
-randX2 <- runif(1, min = 10000, max= 11500) # x value for first high income outlier
-randX3 <- runif(1, min = 10000, max= 11500) # x value for second high income outlier
-randX4 <- runif(1, min = 10000, max = 12000)
+randX2 <- runif(1, min = 11000, max= 12500) # x value for first high income outlier
+randX3 <- runif(1, min = 11000, max= 12500) # x value for second high income outlier
+randX4 <- runif(1, min = 12000, max = 13000)
 randY1 <- 0
 randY2 <- runif(1, min = 13000, max = 15000)
 randY3 <- runif(1, min = 12000, max = 15000)
@@ -24,27 +25,23 @@ ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 150),
 
 df1 = data.frame(X = c(31:34), airq = c(rep(1, 4)), vala = c(randY1, randY2, randY3, randY4), 
                  rain = c(rep(1, 4)), coas = c(rep("yes", 4)), dens = c(rep(1, 4)),
-                 medi = c(randX1, randX2, randX3, randX4)) # Create data frame from random outliers
+                 medi = c(randX1, randX2, randX3, randX4), outlier = rep("yes", 4)) # Create data frame from random outliers
 
 df2 = data.frame(X = 31, airq = 1, vala = randY1, 
                  rain = 1, coas = "yes", dens = 1, 
-                 medi = randX1) # Create data frame for noHighTab2
+                 medi = randX1, outlier = "yes") # Create data frame for noHighTab2
 
 df3 = data.frame(X = c(32:34), airq = c(rep(1, 3)), vala = c(randY2, randY3, randY4), 
                  rain = c(rep(1, 3)), coas = c(rep("yes", 3)), dens = c(rep(1, 3)), 
-                 medi = c(randX2, randX3, randX4)) # Create data frame for noMedTab2
+                 medi = c(randX2, randX3, randX4), outlier = rep("yes", 3)) # Create data frame for noMedTab2
 
 initialTab2 <- rbind(initial, df1)
-initialTab2$outlier <- c(rep("no", 23), rep("yes", 4))
 
 noHighTab2 <- rbind(initial, df2)
-noHighTab2$outlier <- c(rep("no", 23), "yes")
 
 noMedTab2 <- rbind(initial, df3)
-noMedTab2 <- c(rep("no", 23), rep("yes", 3))
 
 
-View(noHighTab2)
 # Create augmented data frame with predictions
 initialModel <- lm(vala ~ medi, data = initialTab2)
 
@@ -150,7 +147,8 @@ server <- function(input, output) {
     g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
         labs(title = "Business Value Added vs. Median Income",
              x = "Median Household Income", y = "Business Value Added") + 
-        geom_smooth(method = "lm", se = FALSE)
+        geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+        xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
 
     # Initial plot to graph when session starts
 
@@ -160,8 +158,9 @@ server <- function(input, output) {
             g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE) + xlim(0, 12000) + ylim(0, 15000) + 
-                theme_economist()
+                geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+                xlim(0, 13000) + ylim(0, 15000) + 
+                theme_economist() + scale_color_brewer(palette = "Dark2")
         }
         if(length(input$remove) == 1) { # When one checkbox checked
             
@@ -169,23 +168,26 @@ server <- function(input, output) {
                 g <- ggplot(data=noMedTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
-                    geom_smooth(method = "lm", se = FALSE) + xlim(0, 12000) + ylim(0, 15000) + 
-                    theme_economist()
+                    geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+                    xlim(0, 13000) + ylim(0, 15000) + 
+                    theme_economist() + scale_color_brewer(palette = "Dark2")
             }
             if(input$remove == "High Income Outliers") { #When only remove High Income Outliers is checked
                 g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
-                    geom_smooth(method = "lm", se = FALSE) + xlim(0, 12000) + ylim(0, 15000) + 
-                    theme_economist()
+                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
+                    xlim(0, 13000) + ylim(0, 15000) + 
+                    theme_economist() + scale_color_brewer(palette = "Dark2")
             }
         }
         else if (length(input$remove == 2)){ # When both checkboxes are checked, use initial dataframe
             g <- ggplot(data=initial, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE) + xlim(0, 12000) + ylim(0, 15000) + 
-                theme_economist()
+                geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+                xlim(0, 13000) + ylim(0, 15000) + 
+                theme_economist() + scale_color_brewer(palette = "Dark2")
             
         }
         g
@@ -269,7 +271,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     geom_hline(yintercept = leverageThresh, color = "red") +
     labs(title = "Leverage by Observation",
          x = "Observation Number",
-         y = "Leverage")
+         y = "Leverage") + theme_economist()
 
     output$measureGraph <- renderPlot({
         if(input$measure == "leverage") {
@@ -279,7 +281,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(title = "Leverage by Observation",
                      x = "Observation Number",
                      y = "Leverage") + 
-                geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),""))) +
+                geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),""))) + 
                 theme_economist()
         }
         if(input$measure == "standardizedResiduals") {
@@ -290,7 +292,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(title = "Standard Residuals vs. Predicted Value",
                      x = "Predicted",
                      y = "Standard Residuals") + 
-                geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ",as.character(obs_num)),""))) + 
+                geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ", as.character(obs_num)),""))) + 
                 theme_economist()
         }
         else if(input$measure == "cooksDistance"){
