@@ -257,16 +257,16 @@ output$measureFormula <- renderUI({
 
     if (input$measure == "leverage") {
         withMathJax(
-            '$h_{i} = \\frac{1}{n}+\\frac{(x_{i}-x\\bar{})^{2}}{\\sum_{j=1}^{n}(x_{j}-x\\bar{})^{2}}$')
+            '$\\large h_{i} = \\frac{1}{n}+\\frac{(x_{i}-x\\bar{})^{2}}{\\sum_{j=1}^{n}(x_{j}-x\\bar{})^{2}}$')
     }
     else if (input$measure == "standardizedResiduals") {
         withMathJax(
-            '$\\frac{e_{i}}{\\sigma \\widehat{}\\sqrt{1-h_{i}}}$'
+            '$\\large std. resid._{i}=\\frac{e_{i}}{\\sigma \\widehat{}\\sqrt{1-h_{i}}}$'
         )
     }
     else {
         withMathJax(
-        '$D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$'
+        '$\\large D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$'
         )
     }
     
