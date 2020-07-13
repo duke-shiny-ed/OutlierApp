@@ -54,6 +54,9 @@ leverageThresh = 2*(2 + 1) / nrow(initial_aug) # define leverage threshold
 # Define UI for application
 ui <- fluidPage(
     titlePanel("How to Identify and Deal with Outliers"),
+    withMathJax(),
+    tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
+    processEscapes: true}});"),
     navbarPage("Tabs",
                tabPanel("About",
                         fluidRow(
@@ -251,18 +254,22 @@ output$measureDefinition <- renderText({
 # Code for measureFormula below
 formula = ''
 output$measureFormula <- renderUI({
-    if(input$measure == "leverage") {
-    withMathJax(
-       helpText('$h_{i} = \frac{1}{n}+\frac{(x_{i}-x\bar{})^{2}}{\\sum_{j=1}^{n}(x_{j}-x\bar{})^{2}}$'))
-}
-    else if(input$measure == "standardizedResiduals") {
-        formula = ''
+
+    if (input$measure == "leverage") {
+        withMathJax(
+            '$h_{i} = \\frac{1}{n}+\\frac{(x_{i}-x\\bar{})^{2}}{\\sum_{j=1}^{n}(x_{j}-x\\bar{})^{2}}$')
+    }
+    else if (input$measure == "standardizedResiduals") {
+        withMathJax(
+            '$\\frac{e_{i}}{\\sigma \\widehat{}\\sqrt{1-h_{i}}}$'
+        )
     }
     else {
-        formula <- ''
+        withMathJax(
+        '$D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$'
+        )
     }
     
-withMathJax(formula)
     })
 
 # Code for measureGraph below
