@@ -17,7 +17,7 @@ randX4 <- runif(1, min = 12000, max = 13000)
 randY1 <- 0
 randY2 <- runif(1, min = 13000, max = 15000)
 randY3 <- runif(1, min = 12000, max = 15000)
-randY4 <- runif(1, min = 100, max = 300)
+randY4 <- runif(1, min = 100, max = 1000)
 
 determiner <- runif(1, min = 0, max = 1)
 ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 150),
@@ -70,14 +70,42 @@ ui <- fluidPage(
                         ),
                         fluidRow(
                             column(6,
-                                   h5("Identifying Outliers \n")
-                                   
+                                   h5("Identifying Outliers"),
+                                   tags$br(),
+                                   tags$ul(
+                                       tags$li("Leverage"),
+                                       tags$li("Standardized residuals"),
+                                       tags$li("Cook's Distance")
+                                   ),
+                                   tags$br(),
+                                   tags$br()
                             ),
                             column(6,
-                                   h5("Dealing with Outliers")
-                                   
+                                   h5("Dealing with Outliers"),
+                                   tags$br(),
+                                   tags$ul(
+                                       tags$li("Transforming the data"),
+                                       tags$li("Increasing sample size"),
+                                       tags$li("Removing outliers")
+                                   ),
+                                   tags$br(),
+                                   tags$br()
                             )
-                        ) #end of second row
+                        ), #end of second row
+                        fluidRow(
+                           "Click on the next tab, 'Identify Outliers', to get started!",
+                           tags$br(), tags$br(), tags$br(), tags$br(), tags$br(), tags$br() 
+                        ), #end of third row
+                        
+                        fluidRow(
+                            "The data on this site is a sample from an air quality data set for California metro areas.
+                             It has been altered to include outliers for educational purposes. See the original data ",
+                            tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", "here."),
+                            tags$br(), tags$br()
+                        ), # end of fourth row
+                        fluidRow(
+                            tags$em("This site was created by Glen Morgenstern and is hosted by the Duke Statistical Science Department.")
+                       ) #end of fifth row
                ), #end of first tab
                
                tabPanel("Identify Outliers",
@@ -100,7 +128,7 @@ ui <- fluidPage(
                         ) 
                ), #end of second tab
                
-               tabPanel("Measuring Outliers",
+               tabPanel("Measure Outliers",
                         sidebarLayout(
                             sidebarPanel(
                                 helpText("Toggle the radio buttons to learn how to calculate measures for outliers and what they mean."),
@@ -115,9 +143,22 @@ ui <- fluidPage(
                             ),
                             mainPanel(
                                 plotOutput("measureGraph"),
-                                textOutput("measureThresholds")
-                            )
+                                
+                                tags$b("Common Thresholds for Outliers"),
+                                tags$br(),
+                                "An observation can be considered an outlier if:",
+                                tags$br(),
+                                tags$b("1. "), "Leverage > ((2p+2))/(n), where (p)=num. of parameters + 1 and (n) is number of observations, OR",
+                                tags$br(),
+                                tags$b("2. "), "|Std. Resid.| > 2, OR",
+                                tags$br(),
+                                tags$b("3. "), "Cook's Distance > 1",
+                                tags$br(),
+                                tags$br(),
+                                "Which observations can you identify as outliers?"
+                            
                         )
+               )
                ), #end of third tab
                
                tabPanel("Solutions for Outliers",
@@ -234,19 +275,19 @@ output$measureDefinition <- renderText({
         definition = "Leverage is the measure of the distance between 
         an observation's values of the predictor variables and the 
         average values of the predictor variables for the whole data set. 
-        Formula below:"
+        Formula below: \n \n"
     }
     
     else if(input$measure == "standardizedResiduals") {
         definition = "The standardized residual is the residual divided by 
         the standard error. The residual is an observation's actual value minus 
-        the model's predicted value for that observation. Formula below:"
+        the model's predicted value for that observation. Formula below: \n \n"
     }
     
     else {
         definition = "Cook's Distance is a measure of an observation's 
         overall impact. It's the effect that removing the observation has on 
-        the estimated coefficients. Formula below:"
+        the estimated coefficients. Formula below: \n \n"
     }
     definition
 })
@@ -257,16 +298,19 @@ output$measureFormula <- renderUI({
 
     if (input$measure == "leverage") {
         withMathJax(
-            '$\\large h_{i} = \\frac{1}{n}+\\frac{(x_{i}-x\\bar{})^{2}}{\\sum_{j=1}^{n}(x_{j}-x\\bar{})^{2}}$')
+            '$\\large h_{i} = \\frac{1}{n}+\\frac{(x_{i}-\\bar{x})^{2}}{\\sum_{j=1}^{n}(x_{j}-\\bar{x})^{2}}$ 
+            where (n) is the number of observations')
     }
     else if (input$measure == "standardizedResiduals") {
         withMathJax(
-            '$\\large std. resid._{i}=\\frac{e_{i}}{\\sigma \\widehat{}\\sqrt{1-h_{i}}}$'
+            '$\\large std. resid._{i}=\\frac{e_{i}}{\\widehat{\\sigma}\\sqrt{1-h_{i}}}$ 
+            where $e_{i}$ is the residual (y-\\hat{y}) and $h_{i}$ is leverage.'
         )
     }
     else {
         withMathJax(
-        '$\\large D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$'
+        '$\\large D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$ 
+        where (p) is the number of parameteres in the model and (h) is leverage.'
         )
     }
     
@@ -315,6 +359,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     })
 
     
+
     output$originalGraph <- renderPlot({
         # Code for original graph
     })
