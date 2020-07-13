@@ -310,7 +310,7 @@ output$measureFormula <- renderUI({
     else {
         withMathJax(
         '$\\large D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$ 
-        where (p) is the number of parameteres in the model and (h) is leverage.'
+        where (p) is the number of parameters in the model and (h) is leverage.'
         )
     }
     
