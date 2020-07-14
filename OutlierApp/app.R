@@ -187,7 +187,7 @@ ui <- fluidPage(
                tabPanel("Solutions for Outliers",
                         sidebarLayout(
                             sidebarPanel(
-                                helpText("Help text here"),
+                                helpText("What should you do with your outliers? See whether the actions below are appropriate."),
                                 checkboxGroupInput("solution",
                                                    "Click to perform the indicated action on the model:",
                                                    c("Remove middle income outlier" = "mid4",
@@ -404,7 +404,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(title = "(Unchanged) Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                theme_classic() + scale_color_brewer(palette = "Dark2")
+                theme_classic()
         }
         
         med <- "med4" %in% input$solution
@@ -418,69 +418,109 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 s <- ggplot(data=noMedTab2, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
-                    geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
             
             if(high) { #When only remove High Income Outliers is checked
                 s <- ggplot(data=noHighTab2, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
-                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
             
             if(sample) { #When only remove High Income Outliers is checked
                 s <- ggplot(data=largeSample, aes(x=medi, y=vala)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
-                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000)+ scale_color_brewer(palette = "Dark2")
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
             else { # When only log transform is checked
                 s <- ggplot(data=initialTab2, aes(x=medi, y=log(vala))) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
-                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
             
         }
         else if (length(input$solution == 2)){ # When two checkboxes are checked
             if (med & high) {
-                
+                s <- ggplot(data = initial, aes(x = medi, y = vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() + 
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else if (med & sample) {
-                
+            else if (med & sample) { # When middle income and large sample checked
+                s <- ggplot(data=largeSampleNoMed, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else if (med & log) {
-                
+            else if (med & log) { # When middle income and log transform are checked
+                s <- ggplot(data=noMedTab2, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else if (high & sample) {
-                
+            else if (high & sample) { # When high income and sample are checked
+                s <- ggplot(data=largeSampleNoHigh, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else if (high & log) {
-                
+            else if (high & log) { # When high income and log transform are checked
+                s <- ggplot(data=largeSampleNoHigh, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else {
-                
+            else { # When sample and log checked
+                s <- ggplot(data=largeSample, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
             
         }
         
         
         else if (length(input$solution == 3)) { # When three checkboxes are checked
-            if(med & high & sample) {
-                
+            if(med & high & sample) { # When middle income, high income, and large sample checked
+                s <- ggplot(data=largeSampleNoOutliers, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else if (med & high & log) {
-                
+            else if (med & high & log) { # When middle income, high income, and log transform checked
+                s <- ggplot(data=initial, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else if(high & sample & log) {
-                
+            else if(high & sample & log) { # When high income, large sample, and log transform checked
+                s <- ggplot(data=largeSampleNoHigh, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
-            else {
-                
+            else { # When med, sample, and log checked
+                s <- ggplot(data=largeSampleNoMed, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                    xlim(0, 13000) + ylim(0, 15000)
             }
 
         }
@@ -489,8 +529,8 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             s <- ggplot(data=largeSampleNoOutliers, aes(x=medi, y=log(vala))) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added")+ 
-                geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
+                geom_smooth(method = "lm", se = FALSE) + theme_classic() +
+                xlim(0, 13000) + ylim(0, 15000)
         }
         s # plot s
     })
