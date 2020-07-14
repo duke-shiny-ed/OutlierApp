@@ -6,6 +6,7 @@ library(knitr)
 library(broom)
 library(ggthemes)
 library(RColorBrewer)
+library(learnr)
 
 initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
