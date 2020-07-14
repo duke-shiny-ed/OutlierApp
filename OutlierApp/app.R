@@ -62,7 +62,7 @@ df4 = data.frame(X = c(35:53), airq = c(rep(1, 19)), vala = largeSampleY,
 largeSample <- rbind(initialTab2, df4)
 largeSampleNoMed <- rbind(noMedTab2, df4)
 largeSampleNoHigh <- rbind(noHighTab2, df4)
-largeSampleNoOutliers <- ribind(initial, df4)
+largeSampleNoOutliers <- rbind(initial, df4)
 
 # Create augmented data frame with predictions
 initialModel <- lm(vala ~ medi, data = initialTab2)
@@ -398,20 +398,13 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     
     # Code for solutionsGraph
     output$solutionsGraph <- renderPlot({
-        s <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
-            labs(title = "Business Value Added vs. Median Income",
-                 x = "Median Household Income", y = "Business Value Added") + 
-            geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-            xlim(0, 13000) + ylim(0, 15000) + 
-            theme_economist() + scale_color_brewer(palette = "Dark2")
         
         if(is.null(input$solution)) { # When no checkboxes checked, change data frame to initialTab2
             s <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
-                labs(title = "Business Value Added vs. Median Income",
+                labs(title = "(Unchanged) Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 15000) + 
-                theme_economist() + scale_color_brewer(palette = "Dark2")
+                theme_classic() + scale_color_brewer(palette = "Dark2")
         }
         
         med <- "med4" %in% input$solution
@@ -426,8 +419,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
                     geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + 
-                    theme_economist() + scale_color_brewer(palette = "Dark2")
+                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
             }
             
             if(high) { #When only remove High Income Outliers is checked
@@ -435,8 +427,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + 
-                    theme_economist() + scale_color_brewer(palette = "Dark2")
+                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
             }
             
             if(sample) { #When only remove High Income Outliers is checked
@@ -444,16 +435,14 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + 
-                    theme_economist() + scale_color_brewer(palette = "Dark2")
+                    xlim(0, 13000) + ylim(0, 15000)+ scale_color_brewer(palette = "Dark2")
             }
             else { # When only log transform is checked
                 s <- ggplot(data=initialTab2, aes(x=medi, y=log(vala))) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + 
-                    theme_economist() + scale_color_brewer(palette = "Dark2")
+                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
             }
             
         }
@@ -501,8 +490,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added")+ 
                 geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 15000) + 
-                theme_economist() + scale_color_brewer(palette = "Dark2")
+                xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
         }
         s # plot s
     })
