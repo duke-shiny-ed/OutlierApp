@@ -42,6 +42,27 @@ noHighTab2 <- rbind(initial, df2)
 
 noMedTab2 <- rbind(initial, df3)
 
+# Now, create random values for added sample size
+randX5 <- runif(5, min = 400, max = 4000)
+randX6 <- runif(5, min = 4000, max = 9000)
+randY5 <- runif(5, min = 200, max = 1000)
+randY6 <- runif(5, min = 800, max = 8000)
+randX7 <- runif(4, min = 9000, max = 11000)
+randX8 <- runif(5, min = 11000, max = 13200)
+randY7 <- runif(4, min = 4000, max = 10000)
+randY8 <- runif(5, min = 100, max = 15000)
+
+largeSampleX <- c(randX5, randX6, randX7, randX8)
+largeSampleY <- c(randY5, randY6, randY7, randY8)
+
+df4 = data.frame(X = c(35:53), airq = c(rep(1, 19)), vala = largeSampleY, 
+                 rain = c(rep(1, 19)), coas = c(rep("yes", 19)), dens = c(rep(1, 19)), 
+                 medi = largeSampleX, outlier = rep("no", 19)) # Create data frame for largeSample
+
+largeSample <- rbind(initialTab2, df4)
+largeSampleNoMed <- rbind(noMedTab2, df4)
+largeSampleNoHigh <- rbind(noHighTab2, df4)
+largeSampleNoOutliers <- ribind(initial, df4)
 
 # Create augmented data frame with predictions
 initialModel <- lm(vala ~ medi, data = initialTab2)
@@ -169,13 +190,16 @@ ui <- fluidPage(
                                 helpText("Help text here"),
                                 checkboxGroupInput("solution",
                                                    "Click to perform the indicated action on the model:",
-                                                   c("Remove Middle Income Outlier" = "mid4",
-                                                     "Remove High Income Outliers" = "high4",
-                                                     "Log Transform the Data" = "logTransform"))
+                                                   c("Remove middle income outlier" = "mid4",
+                                                     "Remove high income outliers" = "high4",
+                                                     "Increase sample size" = "increaseSample",
+                                                     "Log transform the data" = "logTransform"))
                             ),
                             mainPanel(
                                 fluidRow(
-                                    splitLayout(cellWidths = c("50%", "50%"), plotOutput("originalGraph"), plotOutput("solutionsGraph"))
+                                    splitLayout(cellWidths = c("50%", "50%"), 
+                                                wellPanel(plotOutput("originalGraph")), 
+                                                wellPanel(plotOutput("solutionsGraph")))
                                 )
                             )
                         )
@@ -361,13 +385,126 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     })
 
     
-
+# Code for tab 3 start
+    
+    # Code for originalGraph
     output$originalGraph <- renderPlot({
-        # Code for original graph
+        ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
+            labs(title = "(Unchanged) Value Added vs. Median Income",
+                 x = "Median Household Income", y = "Business Value Added") + 
+            geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+            theme_classic() + scale_color_brewer(palette = "Dark2")
     })
     
+    # Code for solutionsGraph
     output$solutionsGraph <- renderPlot({
-        # Code for solutions graph
+        s <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
+            labs(title = "Business Value Added vs. Median Income",
+                 x = "Median Household Income", y = "Business Value Added") + 
+            geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+            xlim(0, 13000) + ylim(0, 15000) + 
+            theme_economist() + scale_color_brewer(palette = "Dark2")
+        
+        if(is.null(input$solution)) { # When no checkboxes checked, change data frame to initialTab2
+            s <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
+                labs(title = "Business Value Added vs. Median Income",
+                     x = "Median Household Income", y = "Business Value Added") + 
+                geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+                xlim(0, 13000) + ylim(0, 15000) + 
+                theme_economist() + scale_color_brewer(palette = "Dark2")
+        }
+        
+        med <- "med4" %in% input$solution
+        high <- "high4" %in% input$solution
+        sample <- "increaseSample" %in% input$solution
+        log <- "logTransform" %in% input$solution
+        
+        if(length(input$solution) == 1) { # When one checkbox checked
+            
+            if (med) { # When only remove Middle Income Outlier checked
+                s <- ggplot(data=noMedTab2, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added") + 
+                    geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+                    xlim(0, 13000) + ylim(0, 15000) + 
+                    theme_economist() + scale_color_brewer(palette = "Dark2")
+            }
+            
+            if(high) { #When only remove High Income Outliers is checked
+                s <- ggplot(data=noHighTab2, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added")+ 
+                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
+                    xlim(0, 13000) + ylim(0, 15000) + 
+                    theme_economist() + scale_color_brewer(palette = "Dark2")
+            }
+            
+            if(sample) { #When only remove High Income Outliers is checked
+                s <- ggplot(data=largeSample, aes(x=medi, y=vala)) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added")+ 
+                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
+                    xlim(0, 13000) + ylim(0, 15000) + 
+                    theme_economist() + scale_color_brewer(palette = "Dark2")
+            }
+            else { # When only log transform is checked
+                s <- ggplot(data=initialTab2, aes(x=medi, y=log(vala))) + geom_point() + 
+                    labs(title = "Business Value Added vs. Median Income",
+                         x = "Median Household Income", y = "Business Value Added")+ 
+                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
+                    xlim(0, 13000) + ylim(0, 15000) + 
+                    theme_economist() + scale_color_brewer(palette = "Dark2")
+            }
+            
+        }
+        else if (length(input$solution == 2)){ # When two checkboxes are checked
+            if (med & high) {
+                
+            }
+            else if (med & sample) {
+                
+            }
+            else if (med & log) {
+                
+            }
+            else if (high & sample) {
+                
+            }
+            else if (high & log) {
+                
+            }
+            else {
+                
+            }
+            
+        }
+        
+        
+        else if (length(input$solution == 3)) { # When three checkboxes are checked
+            if(med & high & sample) {
+                
+            }
+            else if (med & high & log) {
+                
+            }
+            else if(high & sample & log) {
+                
+            }
+            else {
+                
+            }
+
+        }
+        
+        else { # When all checkboxes are checked
+            s <- ggplot(data=largeSampleNoOutliers, aes(x=medi, y=log(vala))) + geom_point() + 
+                labs(title = "Business Value Added vs. Median Income",
+                     x = "Median Household Income", y = "Business Value Added")+ 
+                geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
+                xlim(0, 13000) + ylim(0, 15000) + 
+                theme_economist() + scale_color_brewer(palette = "Dark2")
+        }
+        s # plot s
     })
 }
 
