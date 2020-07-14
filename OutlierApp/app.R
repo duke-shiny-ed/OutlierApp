@@ -140,6 +140,7 @@ ui <- fluidPage(
                                                "Cook's Distance" = "cooksDistance"
                                              )),
                                 textOutput("measureDefinition"),
+                                tags$br(),
                                 uiOutput("measureFormula")
                             ),
                             mainPanel(
