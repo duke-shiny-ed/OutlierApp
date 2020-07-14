@@ -145,12 +145,12 @@ ui <- fluidPage(
                             ),
                             mainPanel(
                                 plotOutput("measureGraph"),
-                                
+                                wellPanel(
                                 tags$b("Common Thresholds for Outliers"),
                                 tags$br(),
                                 "An observation can be considered an outlier if:",
                                 tags$br(),
-                                tags$b("1. "), "Leverage > ((2p+2))/(n), where (p)=num. of parameters + 1 and (n) is number of observations, OR",
+                                tags$b("1. "), withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of parameters + 1 and (n) is number of observations, OR"),
                                 tags$br(),
                                 tags$b("2. "), "|Std. Resid.| > 2, OR",
                                 tags$br(),
@@ -158,7 +158,7 @@ ui <- fluidPage(
                                 tags$br(),
                                 tags$br(),
                                 "Which observations can you identify as outliers?"
-                            
+                                )
                         )
                )
                ), #end of third tab
