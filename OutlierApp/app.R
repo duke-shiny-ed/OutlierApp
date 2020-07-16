@@ -553,7 +553,11 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         logTrans <- "Log transform the data" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
-            description <- "All boxes checked"
+            description <- "Increasing sample size and log transformation are considered 
+            acceptable here, but removing an outlier because of an unusually high/low 
+            response variable is not acceptable. The medium income outlier is a legitimate 
+            observation. Note that with a larger sample size, the old high income outlier 
+            is no longer an outlier. No need to exclude it!"
         }
         else if (med4 & high4 & sample4){
             description <- "Med high and sample"
