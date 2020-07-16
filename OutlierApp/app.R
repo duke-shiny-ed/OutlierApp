@@ -417,91 +417,106 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         }
         else if (med4 & high4 & sample4){
             solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         } 
         else if (med4 & high4 & logTrans){
             solnGraph <- ggplot(data = initial, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         } 
         else if (med4 & sample4 & logTrans){
             solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         } 
         else if (high4 & sample4 & logTrans) {
             solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         }  
         else if (med4 & high4){
             solnGraph <- ggplot(data = initial, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         } 
         else if (med4 & logTrans){
             solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         } 
         else if (med4 & sample4){
             solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         } 
         else if (high4 & sample4) {
             solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         }  
         else if(high4 & logTrans) {
             solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         }
         else if(sample4 & logTrans) {
             solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         }
         else if(med4) {
             solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         }
         else if(high4) {
             solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         }
         else if(sample4) {
             solnGraph <- ggplot(data = largeSample, aes(x = medi, y = vala)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                xlim(0, 13000) + ylim(0, 15000)
         }
         else if(logTrans) {
             solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(vala))) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE) + 
                 labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)")
+                     x = "Median Household Income", y = "Log(Business Value Added)") + 
+                xlim(0, 13000)
         }
         
         solnGraph
