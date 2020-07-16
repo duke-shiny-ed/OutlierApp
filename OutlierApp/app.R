@@ -47,12 +47,12 @@ noMedTab2 <- rbind(initial, df3)
 # Now, create random values for added sample size
 randX5 <- runif(5, min = 400, max = 4000)
 randX6 <- runif(5, min = 4000, max = 9000)
-randY5 <- runif(5, min = 200, max = 1000)
-randY6 <- runif(5, min = 800, max = 5000)
+randY5 <- runif(5, min = 200, max = 1200)
+randY6 <- runif(5, min = 800, max = 4000)
 randX7 <- runif(4, min = 9000, max = 11000)
-randX8 <- runif(5, min = 11000, max = 13200)
+randX8 <- runif(5, min = 11000, max = 13000)
 randY7 <- runif(4, min = 4000, max = 10000)
-randY8 <- runif(5, min = 100, max = 15000)
+randY8 <- runif(5, min = 200, max = 15000)
 
 largeSampleX <- c(randX5, randX6, randX7, randX8)
 largeSampleY <- c(randY5, randY6, randY7, randY8)
@@ -201,6 +201,8 @@ theme = shinytheme("simplex"),
                             ),
                             mainPanel(
                                     plotOutput("solutionsGraph"),
+                                    tags$h4(
+                                        tags$b("Did I Choose the Right Solution?")),
                                     wellPanel(textOutput("solutionsDescription"))
                             )
                         )
@@ -403,9 +405,10 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         solnGraph = ggplot()
         if (is.null(input$solution)) {
             solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = vala, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "(Unchanged) Value Added vs. Household Income", 
-                     x = "Median Household Income", y = "Business Value Added")
+                     x = "Median Household Income", y = "Business Value Added") + 
+                scale_color_brewer(palette = "Dark2")
         }
         
         med4     <- "Remove middle income outlier" %in% input$solution
@@ -414,109 +417,124 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         logTrans <- "Log transform the data" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000) + 
+                scale_color_brewer(palette = "Dark2")
         }
         else if (med4 & high4 & sample4){
-            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000)+ 
+                scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & high4 & logTrans){
-            solnGraph <- ggplot(data = initial, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = initial, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & sample4 & logTrans){
-            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         } 
         else if (high4 & sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         }  
         else if (med4 & high4){
-            solnGraph <- ggplot(data = initial, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = initial, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000) + 
+                scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & logTrans){
-            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & sample4){
-            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000)+ 
+                scale_color_brewer(palette = "Dark2")
         } 
         else if (high4 & sample4) {
-            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000)+ 
+                scale_color_brewer(palette = "Dark2")
         }  
         else if(high4 & logTrans) {
-            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         }
         else if(sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         }
         else if(med4) {
-            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000)+ 
+                scale_color_brewer(palette = "Dark2")
         }
         else if(high4) {
-            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000)+ 
+                scale_color_brewer(palette = "Dark2")
         }
         else if(sample4) {
-            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = vala)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)
+                xlim(0, 13000) + ylim(0, 15000)+ 
+                scale_color_brewer(palette = "Dark2")
         }
         else if(logTrans) {
-            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(vala))) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE) + 
+            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(vala), color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)
+                xlim(0, 13000)+ 
+                scale_color_brewer(palette = "Dark2")
         }
         
         solnGraph
