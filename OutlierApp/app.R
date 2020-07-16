@@ -400,22 +400,73 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     # Code for solutionsGraph
     output$solutionsGraph <- renderPlot({
         
-# When no checkboxes checked, change data frame to initialTab2
-            s <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
-                labs(title = "(Unchanged) Value Added vs. Median Income",
-                     x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
+        solnGraph = ggplot()
+        if (is.null(input$solution)) {
+            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = vala, color = outlier)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1))
+        }
         
-            if(is.null(input$solution)) { # When no checkboxes checked, change data frame to initialTab2
-                g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
-                    labs(title = "(Unchanged) Value Added vs. Median Income",
-                         x = "Median Household Income", y = "Business Value Added") + 
-                    geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
-            }
- 
-        s # plot s
+        med4     <- "Remove middle income outlier" %in% input$solution
+        high4    <- "Remove high income outliers"  %in% input$solution
+        sample4 <- "Increase sample size"  %in% input$solution
+        logTrans <- "Log transform the data" %in% input$solution
+        
+        if(med4 & high4 & sample4 & logTrans) {
+            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        }
+        else if (med4 & high4 & sample4){
+            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        } 
+        else if (med4 & high4 & logTrans){
+            solnGraph <- ggplot(data = initial, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        } 
+        else if (med4 & sample4 & logTrans){
+            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        } 
+        else if (high4 & sample4 & logTrans) {
+            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        }  
+        else if (med4 & high4){
+            solnGraph <- ggplot(data = initial, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        } 
+        else if (med4 & logTrans){
+            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        } 
+        else if (med4 & sample4){
+            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        } 
+        else if (high4 & sample4) {
+            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
+        }  
+        else if(high4 & logTrans) {
+            solnGraph <- "High and log"
+        }
+        else if(sample4 & logTrans) {
+            solnGraph <- "Sample and log"
+        }
+        else if(med4) {
+            solnGraph <- "Med"
+        }
+        else if(high4) {
+            solnGraph <- "High"
+        }
+        else if(sample4) {
+            solnGraph <- "Sample"
+        }
+        else if(logTrans) {
+            solnGraph <- "Log"
+        }
+        
+        solnGraph
     })
     
     # Code for solutionsDescription
