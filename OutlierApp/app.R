@@ -448,22 +448,28 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE)
         }  
         else if(high4 & logTrans) {
-            solnGraph <- "High and log"
+            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
         }
         else if(sample4 & logTrans) {
-            solnGraph <- "Sample and log"
+            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
         }
         else if(med4) {
-            solnGraph <- "Med"
+            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
         }
         else if(high4) {
-            solnGraph <- "High"
+            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
         }
         else if(sample4) {
-            solnGraph <- "Sample"
+            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = vala)) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
         }
         else if(logTrans) {
-            solnGraph <- "Log"
+            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(vala))) + 
+                geom_point() + geom_smooth(method = "lm", se = FALSE)
         }
         
         solnGraph
