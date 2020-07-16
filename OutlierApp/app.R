@@ -194,14 +194,14 @@ theme = shinytheme("simplex"),
                                 helpText("What should you do with your outliers? See whether the actions below are appropriate."),
                                 checkboxGroupInput("solution",
                                                    "Click to perform the indicated action on the model:",
-                                                   c("Remove middle income outlier" = "mid4",
-                                                     "Remove high income outliers" = "high4",
-                                                     "Increase sample size" = "increaseSample",
-                                                     "Log transform the data" = "logTransform"))
+                                                   choices = c("Remove middle income outlier",
+                                                     "Remove high income outliers",
+                                                     "Increase sample size",
+                                                     "Log transform the data"))
                             ),
                             mainPanel(
-                                    wellPanel(plotOutput("solutionsGraph"))
-
+                                    plotOutput("solutionsGraph"),
+                                    wellPanel(textOutput("solutionsDescription"))
                             )
                         )
                ), #end of fourth tab
@@ -416,6 +416,67 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             }
  
         s # plot s
+    })
+    
+    # Code for solutionsDescription
+    output$solutionsDescription <- renderText({
+        description = ""
+        if (is.null(input$solution)) {
+            description = ""
+        }
+        
+        med4     <- "Remove middle income outlier" %in% input$solution
+        high4    <- "Remove high income outliers"  %in% input$solution
+        sample4 <- "Increase sample size"  %in% input$solution
+        logTrans <- "Log transform the data" %in% input$solution
+        
+        if(med4 & high4 & sample4 & logTrans) {
+            description <- "All boxes checked"
+        }
+        else if (med4 & high4 & sample4){
+            description <- "Med high and sample"
+        } 
+        else if (med4 & high4 & logTrans){
+            description <- "Med high and log"
+        } 
+        else if (med4 & sample4 & logTrans){
+            description <- "Med sample and log"
+        } 
+        else if (high4 & sample4 & logTrans) {
+            description <- "High sample and log"
+        }  
+        else if (med4 & high4){
+            description <- "Med and high"
+        } 
+        else if (med4 & logTrans){
+            description <- "Med and log"
+        } 
+        else if (med4 & sample4){
+            description <- "Med and sample"
+        } 
+        else if (high4 & sample4) {
+            description <- "High and sample"
+        }  
+        else if(high4 & logTrans) {
+            description <- "High and log"
+        }
+        else if(sample4 & logTrans) {
+            description <- "Sample and log"
+        }
+        else if(med4) {
+            description <- "Med"
+        }
+        else if(high4) {
+            description <- "High"
+        }
+        else if(sample4) {
+            description <- "Sample"
+        }
+        else if(logTrans) {
+            description <- "Log"
+        }
+        
+        description
     })
 }
 
