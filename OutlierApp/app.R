@@ -13,18 +13,18 @@ library(bootstraplib)
 initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
 
-randX1 <- runif(1, min = 5000, max=6000) # x value for mid income outlier
-randX2 <- runif(1, min = 11000, max= 12500) # x value for first high income outlier
-randX3 <- runif(1, min = 11000, max= 12500) # x value for second high income outlier
-randX4 <- runif(1, min = 12000, max = 13000)
+randX1 <- runif(1, min = 5500, max=7000) # x value for mid income outlier
+randX2 <- runif(1, min = 11000, max= 12000) # x value for first high income outlier
+randX3 <- runif(1, min = 11000, max= 12000) # x value for second high income outlier
+randX4 <- runif(1, min = 12000, max = 12000)
 randY1 <- 0
 randY2 <- runif(1, min = 13000, max = 15000)
 randY3 <- runif(1, min = 12000, max = 15000)
 randY4 <- runif(1, min = 100, max = 1000)
 
 determiner <- runif(1, min = 0, max = 1)
-ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 150),
-                                        randY1 <- runif(1, min = 9000, max = 11000))
+ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 100),
+                                        randY1 <- runif(1, min = 10000, max = 11000))
 
 df1 = data.frame(X = c(31:34), airq = c(rep(1, 4)), vala = c(randY1, randY2, randY3, randY4), 
                  rain = c(rep(1, 4)), coas = c(rep("yes", 4)), dens = c(rep(1, 4)),
@@ -90,13 +90,15 @@ theme = shinytheme("simplex"),
                                    h2("About")
                             )
                         ), # end of title row
+                        wellPanel(
                         fluidRow(
                             "In this app, you will learn methods for recognizing and treating outliers in your data.
             These include:"
                         ),
                         fluidRow(
                             column(6,
-                                   h5("Identifying Outliers"),
+                                   h5(
+                                       tags$b("Identifying Outliers")),
                                    tags$br(),
                                    tags$ul(
                                        tags$li("Leverage"),
@@ -107,7 +109,8 @@ theme = shinytheme("simplex"),
                                    tags$br()
                             ),
                             column(6,
-                                   h5("Dealing with Outliers"),
+                                   h5(
+                                       tags$b("Dealing with Outliers")),
                                    tags$br(),
                                    tags$ul(
                                        tags$li("Transforming the data"),
@@ -119,9 +122,8 @@ theme = shinytheme("simplex"),
                             )
                         ), #end of second row
                         fluidRow(
-                           "Click on the next tab, 'Identify Outliers', to get started!",
-                           tags$br(), tags$br(), tags$br(), tags$br(), tags$br(), tags$br() 
-                        ), #end of third row
+                           "Click on the next tab, 'Identify Outliers', to get started!")),
+                           tags$br(), tags$br(), tags$br(), tags$br(), tags$br(), tags$br(), #end of third row
                         
                         fluidRow(
                             "The data on this site is a sample from an air quality data set for California metro areas.
@@ -544,7 +546,8 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     output$solutionsDescription <- renderText({
         description = ""
         if (is.null(input$solution)) {
-            description = ""
+            description = "Click one or more checkboxes to find the acceptable 
+            solutions for these outliers."
         }
         
         med4     <- "Remove middle income outlier" %in% input$solution
@@ -553,57 +556,104 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         logTrans <- "Log transform the data" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
-            description <- "Increasing sample size and log transformation are considered 
+            description <- "Not quite. Increasing sample size and log transformation are considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is not acceptable. The medium income outlier is a legitimate 
             observation. Note that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         }
         else if (med4 & high4 & sample4){
-            description <- "Med high and sample"
+            description <- "Not quite. Increasing sample size is considered 
+            acceptable here, but removing an outlier because of an unusually high/low 
+            response variable is NOT acceptable. The medium income outlier is a legitimate 
+            observation. Also note that with a larger sample size, the old high income outlier 
+            is no longer an outlier. No need to exclude it!"
         } 
         else if (med4 & high4 & logTrans){
-            description <- "Med high and log"
+            description <- "Not quite. A log transformation is acceptable here, but 
+            removing an outlier because of an unusually high/low response variable is 
+            NOT acceptable. The medium income outlier is a legitimate observation."
         } 
         else if (med4 & sample4 & logTrans){
-            description <- "Med sample and log"
+            description <- "Not quite. Increasing sample size and log transformation are considered 
+            acceptable here, but removing an outlier because of an unusually high/low 
+            response variable is NOT acceptable. The medium income outlier is a legitimate 
+            observation. Good job noting that with a larger sample size, the old high income outlier 
+            is no longer an outlier. No need to exclude it!"
         } 
         else if (high4 & sample4 & logTrans) {
-            description <- "High sample and log"
+            description <- "Almost. Increasing sample size and log transformation are considered 
+            acceptable here. Also, good job noting that the middle income outlier is a legitimate 
+            observation that you should keep. However, note that with a larger sample size, the 
+            old high income outlier is no longer an outlier. No need to exclude it!"
         }  
         else if (med4 & high4){
-            description <- "Med and high"
+            description <- "No! There are better strategies than simply removing the outliers. 
+            Removing an outlier because of an unusually high/low response variable is NOT acceptable. 
+            The medium income outlier is a legitimate observation."
         } 
         else if (med4 & logTrans){
-            description <- "Med and log"
+            description <- "No! The log transformation is considered 
+            acceptable here, but removing an outlier because of an unusually high/low 
+            response variable is NOT acceptable. The medium income outlier is a legitimate 
+            observation. However, removing an outlier because of unusual values in a 
+            predictor variable is acceptable, though the predictive range of the model 
+            will diminish."
         } 
         else if (med4 & sample4){
-            description <- "Med and sample"
+            description <- "No! Increasing sample size is considered 
+            acceptable here, but removing an outlier because of an unusually high/low 
+            response variable is NOT acceptable. The medium income outlier is a legitimate 
+            observation. However, removing an outlier because of unusual values in a 
+            predictor variable is acceptable, though the predictive range of the model 
+            will diminish."
         } 
         else if (high4 & sample4) {
-            description <- "High and sample"
+            description <- "Almost. Increasing sample size was a good idea, but 
+            note that with a larger sample size, the old high income outlier is 
+            no longer an outlier. No need to exclude it!"
         }  
         else if(high4 & logTrans) {
-            description <- "High and log"
+            description <- "Yes, this is an acceptable solution! If for some reason, 
+            you cannot increase sample size, try a log transformation. Removing 
+            outliers with unusually high or low values in a predictor variable is 
+            acceptable. Good job! Now, try to find the other acceptable solutions."
         }
         else if(sample4 & logTrans) {
-            description <- "Sample and log"
+            description <- "Yes, this is the optimal solution! Good job seeing 
+            that with a larger sample size, the old high income outlier is no 
+            longer an outlier. The log transformation corrects for the 'fan' that 
+            came with more observations. Try to find the other acceptable solutions."
         }
         else if(med4) {
-            description <- "Med"
+            description <- "No! Removing an outlier because of an unusually high/low 
+            response variable is NOT acceptable. The medium income outlier is a legitimate 
+            observation. However, removing an outlier because of unusual values in a 
+            predictor variable is acceptable, though the predictive range of the model 
+            will diminish."
         }
         else if(high4) {
-            description <- "High"
+            description <- "Yes, this is considered acceptable. Removing an outlier because 
+            of unusual values in a predictor variable is acceptable, though the predictive 
+            range of the model will diminish. There are better solutions available, though. 
+            Try to find them."
         }
         else if(sample4) {
-            description <- "Sample"
+            description <- "Almost. Increasing sample size was a good idea because 
+            your old high income outliers are no longer outliers. However, there is 
+            now a 'fan' pattern in the data. What method might correct this?"
         }
         else if(logTrans) {
-            description <- "Log"
+            description <- "Yes, this is an acceptable solution. The log transformation 
+            helps account for the outliers. But there are even better solutions! Try to 
+            find them."
         }
         
         description
     })
+    
+    # Code for solutions model
+    
 }
 
 # Run the application 
