@@ -93,9 +93,10 @@ theme = shinytheme("simplex"),
                         ), # end of title row
                         wellPanel(
                         fluidRow(
+                            column(12, offset = 0.1,
                             "In this app, you will learn methods for recognizing and treating outliers in your data.
             These include:"
-                        ),
+                        )),
                         fluidRow(
                             column(6,
                                    h5(
@@ -123,8 +124,9 @@ theme = shinytheme("simplex"),
                             )
                         ), #end of second row
                         fluidRow(
-                           "Click on the next tab, 'Identify Outliers', to get started!")),
-                           tags$br(), tags$br(), tags$br(), tags$br(), tags$br(), tags$br(), #end of third row
+                            column(12, offset = 0.1,
+                           "Click on the next tab, 'Identify Outliers', to get started!"))),
+                           tags$br(), tags$br(), tags$br(), tags$br(), #end of third row
                         
                         fluidRow(
                             "The data on this site is a sample from an air quality data set for California metro areas.
@@ -142,6 +144,7 @@ theme = shinytheme("simplex"),
                         # Sidebar with checkboxes
                         sidebarLayout(
                             sidebarPanel(
+                                h4("Identify Outliers"),
                                 helpText("On the right, you see a simple linear model relating median household income and value added by businesses. 
                      Toggle the checkboxes below to remove some data points from the model."),
                                 checkboxGroupInput("remove",
@@ -160,6 +163,7 @@ theme = shinytheme("simplex"),
                tabPanel("Measure Outliers",
                         sidebarLayout(
                             sidebarPanel(
+                                h4("Measure Outliers"),
                                 helpText("Toggle the radio buttons to learn how to calculate measures for outliers and what they mean."),
                                 radioButtons("measure",
                                              "Choose your measure:",
@@ -194,6 +198,7 @@ theme = shinytheme("simplex"),
                tabPanel("Solutions for Outliers",
                         sidebarLayout(
                             sidebarPanel(
+                                h4("Deal with Outliers"),
                                 helpText("What should you do with your outliers? See whether the actions below are appropriate."),
                                 checkboxGroupInput("solution",
                                                    "Click to perform the indicated action on the model:",
