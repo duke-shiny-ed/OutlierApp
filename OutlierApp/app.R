@@ -21,7 +21,7 @@ randX4 <- runif(1, min = 12000, max = 12000)
 randY1 <- 0
 randY2 <- runif(1, min = 13000, max = 15000)
 randY3 <- runif(1, min = 12000, max = 15000)
-randY4 <- runif(1, min = 100, max = 1000)
+randY4 <- runif(1, min = 400, max = 1500)
 
 determiner <- runif(1, min = 0, max = 1)
 ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 100),
