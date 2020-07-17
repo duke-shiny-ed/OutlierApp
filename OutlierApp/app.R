@@ -129,8 +129,8 @@ theme = shinytheme("simplex"),
                            tags$br(), tags$br(), tags$br(), tags$br(), #end of third row
                         
                         fluidRow(
-                            "The data on this site is a sample from an air quality data set for California metro areas.
-                             It has been altered to include outliers for educational purposes. See the original data ",
+                            "The data on this site is a sample from an air quality data set of California metro areas.
+                             It has been altered to include randomly generated outliers for educational purposes. See the original data ",
                             tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", "here."),
                             tags$br(), tags$br()
                         ), # end of fourth row
