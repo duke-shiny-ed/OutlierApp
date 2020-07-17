@@ -9,6 +9,7 @@ library(RColorBrewer)
 library(learnr)
 library(shinythemes)
 library(bootstraplib)
+library(plm)
 
 initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
@@ -52,7 +53,7 @@ randY6 <- runif(5, min = 800, max = 4000)
 randX7 <- runif(4, min = 9000, max = 11000)
 randX8 <- runif(5, min = 11000, max = 13000)
 randY7 <- runif(4, min = 4000, max = 10000)
-randY8 <- runif(5, min = 200, max = 15000)
+randY8 <- runif(5, min = 100, max = 15000)
 
 largeSampleX <- c(randX5, randX6, randX7, randX8)
 largeSampleY <- c(randY5, randY6, randY7, randY8)
@@ -203,6 +204,8 @@ theme = shinytheme("simplex"),
                             ),
                             mainPanel(
                                     plotOutput("solutionsGraph"),
+                                    "$R^{2}$ below:",
+                                    verbatimTextOutput("solutionsR2"),
                                     tags$h4(
                                         tags$b("Did I Choose the Right Solution?")),
                                     wellPanel(textOutput("solutionsDescription"))
@@ -652,7 +655,67 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         description
     })
     
-    # Code for solutions model
+    # Code for solutionsR2
+    output$solutionsR2 <- renderPrint({
+    solnModel <- lm(vala ~ medi, data = initialTab2) # default
+    
+    if (is.null(input$solution)) {
+        solnModel <- lm(vala ~ medi, data = initialTab2) # default
+    }
+    
+    med4     <- "Remove middle income outlier" %in% input$solution
+    high4    <- "Remove high income outliers"  %in% input$solution
+    sample4 <- "Increase sample size"  %in% input$solution
+    logTrans <- "Log transform the data" %in% input$solution
+    
+    if(med4 & high4 & sample4 & logTrans) {
+        solnModel <- lm(log(vala) ~ medi, data = largeSampleNoOutliers)
+    }
+    else if (med4 & high4 & sample4){
+        solnModel <- lm(vala ~ medi, data = largeSampleNoOutliers)
+    } 
+    else if (med4 & high4 & logTrans){
+        solnModel <- lm(log(vala) ~ medi, data = initial)
+    } 
+    else if (med4 & sample4 & logTrans){
+        solnModel <- lm(log(vala) ~ medi, data = noMedTab2)
+    } 
+    else if (high4 & sample4 & logTrans) {
+        solnModel <- lm(log(vala) ~ medi, data = noHighTab2)
+    }  
+    else if (med4 & high4){
+        solnModel <- lm(vala ~ medi, data = initial)
+    } 
+    else if (med4 & logTrans){
+        solnModel <- lm(log(vala) ~ medi, data = noMedTab2)
+    } 
+    else if (med4 & sample4){
+        solnModel <- lm(vala ~ medi, data = largeSampleNoMed)
+    } 
+    else if (high4 & sample4) {
+        solnModel <- lm(vala ~ medi, data = largeSampleNoHigh)
+    }  
+    else if(high4 & logTrans) {
+        solnModel <- lm(log(vala) ~ medi, data = noHighTab2)
+    }
+    else if(sample4 & logTrans) {
+        solnModel <- lm(log(vala) ~ medi, data = largeSample)
+    }
+    else if(med4) {
+        solnModel <- lm(vala ~ medi, data = noMedTab2)
+    }
+    else if(high4) {
+        solnModel <- lm(vala ~ medi, data = noHighTab2)
+    }
+    else if(sample4) {
+        solnModel <- lm(vala ~ medi, data = largeSample)
+    }
+    else if(logTrans) {
+        solnModel <- lm(log(vala) ~ medi, data = initialTab2)
+    }
+    
+        summary(solnModel)$r.squared
+})
     
 }
 
