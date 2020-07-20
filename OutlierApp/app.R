@@ -4,12 +4,11 @@ library(tidyverse)
 library(dplyr)
 library(knitr)
 library(broom)
-library(ggthemes)
 library(RColorBrewer)
 library(learnr)
 library(shinythemes)
 library(bootstraplib)
-library(plm)
+library(shinyBS)
 
 initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
@@ -52,9 +51,11 @@ initialTab2Rows <- sample(nrow(initialTab2))
 noHighTab2Rows <- sample(nrow(noHighTab2))
 noMedTab2Rows <- sample(nrow(noMedTab2))
 
+
 initialTab2 <- initialTab2[initialTab2Rows, ]
 noHighTab2 <- noHighTab2[noHighTab2Rows, ]
 noMedTab2 <- noMedTab2[noMedTab2Rows, ]
+
 
 # Now, create random values for added sample size
 randX5 <- runif(5, min = 400, max = 4000)
@@ -84,8 +85,20 @@ initialModel <- lm(vala ~ medi, data = initialTab2)
 initial_aug <- augment(initialModel) %>%
     mutate(obs_num = row_number())
 
-
 leverageThresh = 2*(2 + 1) / nrow(initial_aug) # define leverage threshold
+
+outlierData <- initial_aug %>% #Filter to find outliers
+    filter(.cooksd > 1 | abs(.std.resid) > 2 | .hat > leverageThresh)
+
+trueOutliers <- outlierData$obs_num #Create vector for true outlier obs nums
+
+# outlierValues = c()
+# for(i in 1:max(initial_aug$obs_num))
+#     if(abs(.std.resid) > 2 | .hat > leverageThresh | .cooksd > 1) {
+#         append(outlierValues, obs_num, after = length(outlierValues))
+#     }
+# print(outlierValues)
+
 
 # Define UI for application
 ui <- fluidPage(
@@ -201,7 +214,14 @@ theme = shinytheme("simplex"),
                                 tags$b("3. "), "Cook's Distance > 1",
                                 tags$br(),
                                 tags$br(),
-                                "Which observations can you identify as outliers?"
+                                bsPopover(id = "outlierList", "as.character(trueOutliers)", trigger = "hover"),
+                                textOutput("outlierList"),
+                                tags$style("#outlierList{color: cornflowerblue;
+                                 font-size: 12px;
+                                 text-align: left;
+                                      font-style: italic;
+                                      }"
+                                )
                                 )
                         )
                )
@@ -353,6 +373,11 @@ output$measureDefinition <- renderText({
         the estimated coefficients. Formula below: \n \n"
     }
     paste0("<font-weight:bold><b>", vocabWord, "</b></font>", definition)
+})
+
+#Code for outlierList below
+output$outlierList <- renderText({
+    c("See outlier observations here")
 })
 
 # Code for measureFormula below
