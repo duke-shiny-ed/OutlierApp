@@ -14,6 +14,7 @@ library(plm)
 initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
 
+
 randX1 <- runif(1, min = 5500, max=7000) # x value for mid income outlier
 randX2 <- runif(1, min = 11000, max= 12000) # x value for first high income outlier
 randX3 <- runif(1, min = 11000, max= 12000) # x value for second high income outlier
@@ -44,6 +45,16 @@ initialTab2 <- rbind(initial, df1)
 noHighTab2 <- rbind(initial, df2)
 
 noMedTab2 <- rbind(initial, df3)
+
+set.seed(33)
+
+initialTab2Rows <- sample(nrow(initialTab2))
+noHighTab2Rows <- sample(nrow(noHighTab2))
+noMedTab2Rows <- sample(nrow(noMedTab2))
+
+initialTab2 <- initialTab2[initialTab2Rows, ]
+noHighTab2 <- noHighTab2[noHighTab2Rows, ]
+noMedTab2 <- noMedTab2[noMedTab2Rows, ]
 
 # Now, create random values for added sample size
 randX5 <- runif(5, min = 400, max = 4000)
@@ -131,7 +142,7 @@ theme = shinytheme("simplex"),
                         fluidRow(
                             "The data on this site is a sample from an air quality data set of California metro areas.
                              It has been altered to include randomly generated outliers for educational purposes. See the original data ",
-                            tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", "here."),
+                            tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", " here."),
                             tags$br(), tags$br()
                         ), # end of fourth row
                         fluidRow(
@@ -145,8 +156,8 @@ theme = shinytheme("simplex"),
                         sidebarLayout(
                             sidebarPanel(
                                 h4("Identify Outliers"),
-                                helpText("On the right, you see a simple linear model relating median household income and value added by businesses. 
-                     Toggle the checkboxes below to remove some data points from the model."),
+                                span(textOutput("identifyText"), style="color:black"),
+                                tags$br(),
                                 checkboxGroupInput("remove",
                                                    "Click to remove:",
                                                    c("Middle Income Outlier",
@@ -227,6 +238,10 @@ theme = shinytheme("simplex"),
 server <- function(input, output) {
 
 #Start of tab 2 code
+    output$identifyText <- renderText({"On the right, you see a simple linear model 
+        relating median household income and value added by businesses. Toggle the 
+        checkboxes below to remove some data points from the model."})
+    
     g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
         labs(title = "Business Value Added vs. Median Income",
              x = "Median Household Income", y = "Business Value Added") + 
