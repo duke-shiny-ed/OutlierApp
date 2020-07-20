@@ -175,14 +175,15 @@ theme = shinytheme("simplex"),
                         sidebarLayout(
                             sidebarPanel(
                                 h4("Measure Outliers"),
-                                helpText("Toggle the radio buttons to learn how to calculate measures for outliers and what they mean."),
+                                span(textOutput("measureText"), style="color:black"),
+                                tags$br(),
                                 radioButtons("measure",
                                              "Choose your measure:",
                                              c("Leverage" = "leverage",
                                                "Standardized residuals" = "standardizedResiduals",
                                                "Cook's Distance" = "cooksDistance"
                                              )),
-                                textOutput("measureDefinition"),
+                                htmlOutput("measureDefinition"),
                                 tags$br(),
                                 uiOutput("measureFormula")
                             ),
@@ -224,7 +225,7 @@ theme = shinytheme("simplex"),
                                     verbatimTextOutput("solutionsR2"),
                                     tags$h4(
                                         tags$b("Did I Choose the Right Solution?")),
-                                    wellPanel(textOutput("solutionsDescription"))
+                                    wellPanel(htmlOutput("solutionsDescription"))
                             )
                         )
                ), #end of fourth tab
@@ -258,7 +259,7 @@ server <- function(input, output) {
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
                 xlim(0, 13000) + ylim(0, 15000) + 
-                theme_economist() + scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2")
         }
         if(length(input$remove) == 1) { # When one checkbox checked
             
@@ -268,7 +269,7 @@ server <- function(input, output) {
                          x = "Median Household Income", y = "Business Value Added") + 
                     geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
                     xlim(0, 13000) + ylim(0, 15000) + 
-                    theme_economist() + scale_color_brewer(palette = "Dark2")
+                    scale_color_brewer(palette = "Dark2")
             }
             if(input$remove == "High Income Outliers") { #When only remove High Income Outliers is checked
                 g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
@@ -276,7 +277,7 @@ server <- function(input, output) {
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
                     xlim(0, 13000) + ylim(0, 15000) + 
-                    theme_economist() + scale_color_brewer(palette = "Dark2")
+                    scale_color_brewer(palette = "Dark2")
             }
         }
         else if (length(input$remove == 2)){ # When both checkboxes are checked, use initial dataframe
@@ -285,7 +286,7 @@ server <- function(input, output) {
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
                 xlim(0, 13000) + ylim(0, 15000) + 
-                theme_economist() + scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2")
             
         }
         g
@@ -322,28 +323,36 @@ server <- function(input, output) {
     
 # Start of tab 3 code
 
+output$measureText <- renderText({
+    "Toggle the radio buttons to learn how to calculate 
+    measures for outliers and what they mean."
+})
 #Code for measureDefinition below
 output$measureDefinition <- renderText({
     definition = ""
+    vocabWord = ""
     if(input$measure == "leverage") {
-        definition = "Leverage is the measure of the distance between 
+        vocabWord<-"Leverage "
+        definition = "is the measure of the distance between 
         an observation's values of the predictor variables and the 
         average values of the predictor variables for the whole data set. 
         Formula below: \n \n"
     }
     
     else if(input$measure == "standardizedResiduals") {
-        definition = "The standardized residual is the residual divided by 
+        vocabWord <- "The standardized residual "
+        definition <- "is the residual divided by 
         the standard error. The residual is an observation's actual value minus 
         the model's predicted value for that observation. Formula below: \n \n"
     }
     
     else {
-        definition = "Cook's Distance is a measure of an observation's 
+        vocabWord <- "Cook's Distance "
+        definition = "is a measure of an observation's 
         overall impact. It's the effect that removing the observation has on 
         the estimated coefficients. Formula below: \n \n"
     }
-    definition
+    paste0("<font-weight:bold><b>", vocabWord, "</b></font>", definition)
 })
 
 # Code for measureFormula below
@@ -376,7 +385,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     geom_hline(yintercept = leverageThresh, color = "red") +
     labs(title = "Leverage by Observation",
          x = "Observation Number",
-         y = "Leverage") + theme_economist()
+         y = "Leverage")
 
     output$measureGraph <- renderPlot({
         if(input$measure == "leverage") {
@@ -387,7 +396,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                      x = "Observation Number",
                      y = "Leverage") + 
                 geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),""))) + 
-                theme_economist()
+                scale_color_brewer(palette = "Dark2")
         }
         if(input$measure == "standardizedResiduals") {
             measurePlot <- ggplot(data = initial_aug, aes(x = .fitted, y = .std.resid)) +
@@ -398,7 +407,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                      x = "Predicted",
                      y = "Standard Residuals") + 
                 geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ", as.character(obs_num)),""))) + 
-                theme_economist()
+                scale_color_brewer(palette = "Dark2")
         }
         else if(input$measure == "cooksDistance"){
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .cooksd)) +
@@ -406,7 +415,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_hline(yintercept=1,color = "red") +
                 labs(x = "Observation Number", y = "Cook's Distance", title = "Cook's Distance") + 
                 geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),""))) + 
-                theme_economist()
+                scale_color_brewer(palette = "Dark2")
         }
         
         measurePlot
@@ -478,7 +487,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)+ 
+                xlim(0, 13000) + 
                 scale_color_brewer(palette = "Dark2")
         }  
         else if (med4 & high4){
@@ -567,6 +576,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     
     # Code for solutionsDescription
     output$solutionsDescription <- renderText({
+        correct = ""
         description = ""
         if (is.null(input$solution)) {
             description = "Click one or more checkboxes to find the acceptable 
@@ -579,44 +589,51 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         logTrans <- "Log transform the data" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
-            description <- "Not quite. Increasing sample size and log transformation are considered 
+            correct <- "Not quite."
+            description <- "Increasing sample size and log transformation are considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is not acceptable. The medium income outlier is a legitimate 
             observation. Note that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         }
         else if (med4 & high4 & sample4){
-            description <- "Not quite. Increasing sample size is considered 
+            correct <- "Not quite."
+            description <- "Increasing sample size is considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. Also note that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         } 
         else if (med4 & high4 & logTrans){
-            description <- "Not quite. A log transformation is acceptable here, but 
+            correct <- "Not quite"
+            description <- ". A log transformation is acceptable here, but 
             removing an outlier because of an unusually high/low response variable is 
             NOT acceptable. The medium income outlier is a legitimate observation."
         } 
         else if (med4 & sample4 & logTrans){
-            description <- "Not quite. Increasing sample size and log transformation are considered 
+            correct <- "Not quite"
+            description <- ". Increasing sample size and log transformation are considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. Good job noting that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         } 
         else if (high4 & sample4 & logTrans) {
-            description <- "Almost. Increasing sample size and log transformation are considered 
+            correct <- "Almost"
+            description <- ". Increasing sample size and log transformation are considered 
             acceptable here. Also, good job noting that the middle income outlier is a legitimate 
             observation that you should keep. However, note that with a larger sample size, the 
             old high income outlier is no longer an outlier. No need to exclude it!"
         }  
         else if (med4 & high4){
-            description <- "No! There are better strategies than simply removing the outliers. 
+            correct <- "No!"
+            description <- " There are better strategies than simply removing the outliers. 
             Removing an outlier because of an unusually high/low response variable is NOT acceptable. 
             The medium income outlier is a legitimate observation."
         } 
         else if (med4 & logTrans){
-            description <- "No! The log transformation is considered 
+            correct <- "No!"
+            description <- " The log transformation is considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. However, removing an outlier because of unusual values in a 
@@ -624,7 +641,8 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             will diminish."
         } 
         else if (med4 & sample4){
-            description <- "No! Increasing sample size is considered 
+            correct <- "No!"
+            description <- " Increasing sample size is considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. However, removing an outlier because of unusual values in a 
@@ -632,47 +650,62 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             will diminish."
         } 
         else if (high4 & sample4) {
-            description <- "Almost. Increasing sample size was a good idea, but 
+            correct <- "Almost"
+            description <- ". Increasing sample size was a good idea, but 
             note that with a larger sample size, the old high income outlier is 
             no longer an outlier. No need to exclude it!"
         }  
         else if(high4 & logTrans) {
-            description <- "Yes, this is an acceptable solution! If for some reason, 
+            correct <- "Yes"
+            description <- ", this is an acceptable solution! If for some reason, 
             you cannot increase sample size, try a log transformation. Removing 
             outliers with unusually high or low values in a predictor variable is 
             acceptable. Good job! Now, try to find the other acceptable solutions."
         }
         else if(sample4 & logTrans) {
-            description <- "Yes, this is the optimal solution! Good job seeing 
+            correct <- "Yes"
+            description <- ", this is the optimal solution! Good job seeing 
             that with a larger sample size, the old high income outlier is no 
             longer an outlier. The log transformation corrects for the 'fan' that 
             came with more observations. Try to find the other acceptable solutions."
         }
         else if(med4) {
-            description <- "No! Removing an outlier because of an unusually high/low 
+            correct <- "No!"
+            description <- " Removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. However, removing an outlier because of unusual values in a 
             predictor variable is acceptable, though the predictive range of the model 
             will diminish."
         }
         else if(high4) {
-            description <- "Yes, this is considered acceptable. Removing an outlier because 
+            correct <- "Yes"
+            description <- ", this is considered acceptable. Removing an outlier because 
             of unusual values in a predictor variable is acceptable, though the predictive 
             range of the model will diminish. There are better solutions available, though. 
             Try to find them."
         }
         else if(sample4) {
-            description <- "Almost. Increasing sample size was a good idea because 
+            correct <- "Almost"
+            description <- ". Increasing sample size was a good idea because 
             your old high income outliers are no longer outliers. However, there is 
             now a 'fan' pattern in the data. What method might correct this?"
         }
         else if(logTrans) {
-            description <- "Yes, this is an acceptable solution. The log transformation 
+            correct <- "Yes"
+            description <- ", this is an acceptable solution. The log transformation 
             helps account for the outliers. But there are even better solutions! Try to 
             find them."
         }
         
-        description
+        if (correct == "No!" | correct =="Not quite") {
+            paste0("<font color=\"#FF0000\"><b>", correct, "</b></font>", description)
+        }
+        else if (correct == "Almost") {
+            paste0("<font color=\"#e6e619\"><b>", correct, "</b></font>", description)
+        }
+        else {
+            paste0("<font color=\"#008000\"><b>", correct, "</b></font>", description)
+        }
     })
     
     # Code for solutionsR2
