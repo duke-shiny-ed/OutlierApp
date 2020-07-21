@@ -1,4 +1,4 @@
-
+rm(list=ls())
 library(shiny)
 library(tidyverse)
 library(dplyr)
@@ -91,6 +91,7 @@ outlierData <- initial_aug %>% #Filter to find outliers
     filter(.cooksd > 1 | abs(.std.resid) > 2 | .hat > leverageThresh)
 
 trueOutliers <- outlierData$obs_num #Create vector for true outlier obs nums
+outlierString <- toString(trueOutliers)
 
 # outlierValues = c()
 # for(i in 1:max(initial_aug$obs_num))
@@ -166,7 +167,7 @@ theme = shinytheme("simplex"),
                tabPanel("Identify Outliers",
                         
                         # Sidebar with checkboxes
-                        sidebarLayout(
+                        sidebarLayout(position = "left",
                             sidebarPanel(
                                 h4("Identify Outliers"),
                                 span(textOutput("identifyText"), style="color:black"),
@@ -180,7 +181,7 @@ theme = shinytheme("simplex"),
                             mainPanel(
                                 plotOutput("outlierGraph"),
                                 verbatimTextOutput("outlierModel")
-                            )
+                            ), fluid = TRUE
                         ) 
                ), #end of second tab
                
@@ -214,14 +215,7 @@ theme = shinytheme("simplex"),
                                 tags$b("3. "), "Cook's Distance > 1",
                                 tags$br(),
                                 tags$br(),
-                                bsPopover(id = "outlierList", "as.character(trueOutliers)", trigger = "hover"),
-                                textOutput("outlierList"),
-                                tags$style("#outlierList{color: cornflowerblue;
-                                 font-size: 12px;
-                                 text-align: left;
-                                      font-style: italic;
-                                      }"
-                                )
+                                paste0("True outliers in this data set are observations ", outlierString)
                                 )
                         )
                )
@@ -446,7 +440,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         measurePlot
     })
 
-    
+
 # Code for tab 3 start
     
     # Code for originalGraph
