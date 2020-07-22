@@ -1,0 +1,12 @@
+name: OutlierApp
+title: OutlierApp
+username:
+account: glenmorgenstern
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2599692
+bundleId: 3419314
+url: https://glenmorgenstern.shinyapps.io/OutlierApp/
+when: 1595380270.57658
+asMultiple: FALSE
+asStatic: FALSE
