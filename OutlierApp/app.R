@@ -118,12 +118,16 @@ theme = shinytheme("simplex"),
                         ), # end of title row
                         wellPanel(
                         fluidRow(
-                            column(12, offset = 0.1,
+                            column(9, offset = 0.1,
                             "Outliers can be tricky to pin down. Once you've figured out where 
                             your outliers are, it's hard to know what do with them. In this app, 
                             you will learn methods for recognizing and treating outliers in your 
-                            data. These include:"
-                        )),
+                            data. These include:",
+                            style='border-right: 1px solid red'
+                        ),
+                            column(3,
+                                   tags$i("Note: Google Chrome ", tags$b("strongly"), 
+                                   " recommended for best user experience."))),
                         fluidRow(
                             column(6,
                                    h5(
