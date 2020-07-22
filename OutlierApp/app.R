@@ -116,6 +116,13 @@ tags$style("
           line-height: 20px; 
       }
   "),
+    
+    tags$style(HTML("
+                    body {font-family: Arial;
+                    font-size: 16px}")),
+    tags$style(HTML("
+                    b {font-family: Arial;
+                    font-size: 16px}")),
     bootstraplib::bootstrap(),
     titlePanel("How to Identify and Deal with Outliers"),
     withMathJax(),
@@ -275,7 +282,7 @@ tags$style("
                                     tags$h4(
                                         tags$b("Did I Choose the Right Solution?")),
                                     wellPanel(htmlOutput("solutionsDescription", 
-                                                         style = "font-size: 14px"))
+                                                         style = "font-size: 17px"))
                             )
                         )
                ), #end of fourth tab
