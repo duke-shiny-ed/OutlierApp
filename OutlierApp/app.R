@@ -93,17 +93,29 @@ outlierData <- initial_aug %>% #Filter to find outliers
 trueOutliers <- outlierData$obs_num #Create vector for true outlier obs nums
 outlierString <- toString(trueOutliers)
 
-# outlierValues = c()
-# for(i in 1:max(initial_aug$obs_num))
-#     if(abs(.std.resid) > 2 | .hat > leverageThresh | .cooksd > 1) {
-#         append(outlierValues, obs_num, after = length(outlierValues))
-#     }
-# print(outlierValues)
-
+sidebarPanel2 <- function (..., out = NULL, width = 12) 
+{
+    div(class = paste0("col-sm-", width), 
+        tags$form(class = "well", ...),
+        out
+    )
+}
 
 # Define UI for application
 ui <- fluidPage(
 theme = shinytheme("simplex"),
+# Edit style for checkboxes and radio buttons
+tags$style("
+      input[type='checkbox']{ /* style for checkboxes */
+        width: 10px; /*Desired width*/
+        height: 10px; /*Desired height*/
+        line-height: 8px; 
+      }
+      span { 
+          margin-left: 5px;  /*set the margin, so boxes don't overlap labels*/
+          line-height: 20px; 
+      }
+  "),
     bootstraplib::bootstrap(),
     titlePanel("How to Identify and Deal with Outliers"),
     withMathJax(),
@@ -178,11 +190,19 @@ theme = shinytheme("simplex"),
                                 h4("Identify Outliers"),
                                 span(textOutput("identifyText"), style="color:black"),
                                 tags$br(),
-                                checkboxGroupInput("remove",
-                                                   "Click to remove:",
+                                checkboxGroupInput("include",
+                                                   "Include:",
                                                    c("Middle Income Outlier",
-                                                     "High Income Outliers")),
+                                                     "High Income Outliers"), 
+                                                   selected = c("Middle Income Outlier",
+                                                                "High Income Outliers")),
+                                sidebarPanel2(
+                                tags$br(),
+                                tags$br(),
+                                wellPanel(tags$b("Goal: "), "See how the model changes when you include 
+                                          and exclude outliers from the data set!")),
                             ),
+                            
                             # Show a plot of the generated model
                             mainPanel(
                                 plotOutput("outlierGraph"),
@@ -202,10 +222,16 @@ theme = shinytheme("simplex"),
                                              c("Leverage" = "leverage",
                                                "Standardized residuals" = "standardizedResiduals",
                                                "Cook's Distance" = "cooksDistance"
-                                             )),
+                                             ))
+                                ,
                                 htmlOutput("measureDefinition"),
                                 tags$br(),
-                                uiOutput("measureFormula")
+                                uiOutput("measureFormula"),
+                                sidebarPanel2(
+                                    tags$br(),
+                                    tags$br(),
+                                    wellPanel(tags$b("Goal: "), "Learn three methods to identify 
+                                              outliers in a data set."))
                             ),
                             mainPanel(
                                 plotOutput("measureGraph"),
@@ -265,7 +291,7 @@ server <- function(input, output) {
 #Start of tab 2 code
     output$identifyText <- renderText({"On the right, you see a simple linear model 
         relating median household income and value added by businesses. Toggle the 
-        checkboxes below to remove some data points from the model."})
+        checkboxes below to include or exclude outliers from the model."})
     
     g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
         labs(title = "Business Value Added vs. Median Income",
@@ -277,26 +303,26 @@ server <- function(input, output) {
 
     
     output$outlierGraph <- renderPlot({
-        if(is.null(input$remove)) { # When no checkboxes checked, change data frame to initialTab2
-            g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
+        if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
+            g <- ggplot(data=initial, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
                 xlim(0, 13000) + ylim(0, 15000) + 
                 scale_color_brewer(palette = "Dark2")
         }
-        if(length(input$remove) == 1) { # When one checkbox checked
+        if(length(input$include) == 1) { # When one checkbox checked
             
-            if (input$remove == "Middle Income Outlier") { # When only remove Middle Income Outlier checked
-                g <- ggplot(data=noMedTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+            if (input$include == "Middle Income Outlier") { # When only include Middle Income Outlier checked
+                g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
                     geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
                     xlim(0, 13000) + ylim(0, 15000) + 
                     scale_color_brewer(palette = "Dark2")
             }
-            if(input$remove == "High Income Outliers") { #When only remove High Income Outliers is checked
-                g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+            if(input$include == "High Income Outliers") { #When only include High Income Outliers is checked
+                g <- ggplot(data=noMedTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
@@ -304,8 +330,8 @@ server <- function(input, output) {
                     scale_color_brewer(palette = "Dark2")
             }
         }
-        else if (length(input$remove == 2)){ # When both checkboxes are checked, use initial dataframe
-            g <- ggplot(data=initial, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        else if (length(input$include == 2)){ # When both checkboxes are checked, use initialTab2 dataframe
+            g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
