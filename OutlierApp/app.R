@@ -1,4 +1,4 @@
-rm(list=ls())
+library(rsconnect)
 library(shiny)
 library(tidyverse)
 library(dplyr)
@@ -119,8 +119,10 @@ theme = shinytheme("simplex"),
                         wellPanel(
                         fluidRow(
                             column(12, offset = 0.1,
-                            "In this app, you will learn methods for recognizing and treating outliers in your data.
-            These include:"
+                            "Outliers can be tricky to pin down. Once you've figured out where 
+                            your outliers are, it's hard to know what do with them. In this app, 
+                            you will learn methods for recognizing and treating outliers in your 
+                            data. These include:"
                         )),
                         fluidRow(
                             column(6,
@@ -215,7 +217,8 @@ theme = shinytheme("simplex"),
                                 tags$b("3. "), "Cook's Distance > 1",
                                 tags$br(),
                                 tags$br(),
-                                paste0("True outliers in this data set are observations ", outlierString)
+                                checkboxInput('answerVisible', tags$i('Show true outliers'), FALSE),
+                                uiOutput('outlierAnswers')
                                 )
                         )
                )
@@ -225,7 +228,9 @@ theme = shinytheme("simplex"),
                         sidebarLayout(
                             sidebarPanel(
                                 h4("Deal with Outliers"),
-                                helpText("What should you do with your outliers? See whether the actions below are appropriate."),
+                                "What should you do with your outliers? See whether the actions below are appropriate.",
+                                tags$br(),
+                                tags$br(),
                                 checkboxGroupInput("solution",
                                                    "Click to perform the indicated action on the model:",
                                                    choices = c("Remove middle income outlier",
@@ -239,7 +244,8 @@ theme = shinytheme("simplex"),
                                     verbatimTextOutput("solutionsR2"),
                                     tags$h4(
                                         tags$b("Did I Choose the Right Solution?")),
-                                    wellPanel(htmlOutput("solutionsDescription"))
+                                    wellPanel(htmlOutput("solutionsDescription", 
+                                                         style = "font-size: 14px"))
                             )
                         )
                ), #end of fourth tab
@@ -369,9 +375,10 @@ output$measureDefinition <- renderText({
     paste0("<font-weight:bold><b>", vocabWord, "</b></font>", definition)
 })
 
-#Code for outlierList below
-output$outlierList <- renderText({
-    c("See outlier observations here")
+#Code for outlierAnswers below
+output$outlierAnswers <- renderUI({
+    if (!input$answerVisible) return()
+    paste0("True outliers in this data set are observations ", outlierString)
 })
 
 # Code for measureFormula below
@@ -608,16 +615,16 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         logTrans <- "Log transform the data" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
-            correct <- "Not quite."
-            description <- "Increasing sample size and log transformation are considered 
+            correct <- "Not quite"
+            description <- ". Increasing sample size and log transformation are considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is not acceptable. The medium income outlier is a legitimate 
             observation. Note that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         }
         else if (med4 & high4 & sample4){
-            correct <- "Not quite."
-            description <- "Increasing sample size is considered 
+            correct <- "Not quite"
+            description <- ". Increasing sample size is considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. Also note that with a larger sample size, the old high income outlier 
