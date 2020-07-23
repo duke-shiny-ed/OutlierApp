@@ -1,5 +1,5 @@
 ---
-title: "Example Quiz"
+title: "Outlier Quiz"
 output: 
   learnr::tutorial:
     progressive: true
@@ -7,7 +7,7 @@ output:
 runtime: shiny_prerendered
 ---
 
-**This is an example quiz to demostrate different question types in learnr.**
+**Review your knowledge of outliers in the quiz below.**
 
 ```{r echo = F}
 knitr::opts_chunk$set(echo = FALSE, 
@@ -22,20 +22,17 @@ library(learnr)
 library(ggplot2)
 ```
 
-## Exercise 1: Multiple choice question
+## Exercise 1: Identifying and Measuring Outliers
 
-Consider the code below: 
-
-```{r echo = TRUE, eval = FALSE}
-ggplot(data = diamonds, aes(x = carat, y = price)) +
-  geom_point(aes(color = cut))
-```
 
 ```{r mc-question}
-question("Which of the following best describes the points on the plot?",
-    answer("The shape is the same for all points.", correct = TRUE),
-    answer("The color is the same for all points.", message = "Hint: look at the aesthetic"),
-    answer("The color and shape are the same for all points.", message = "Are shape and color defined in the aesthetic?"), 
+question("What is measure of an observation's 
+        overall impact on the model called? Formula = $\\large \\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$",
+    answer("Cook's Distance", correct = TRUE),
+    answer("Leverage", message = "Leverage measures the distance between an observation's values of the predictor variables and the 
+        average values of the predictor variables"),
+    answer("Standardized residuals", message = "The standardized residual is the residual divided by the standard error. The residual is an observation's actual value minus the model's predicted value for that observation."), 
+    answer("Residual", message = "We don't use regular residuals to measure outliers. Try again."),
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = TRUE #randomize answer choices
   )
