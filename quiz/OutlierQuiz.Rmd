@@ -7,7 +7,7 @@ output:
 runtime: shiny_prerendered
 ---
 
-**Review your knowledge of outliers in the quiz below.**
+**Review your knowledge of outliers in this quick 5-question quiz.**
 
 ```{r echo = F}
 knitr::opts_chunk$set(echo = FALSE, 
@@ -22,15 +22,15 @@ library(learnr)
 library(ggplot2)
 ```
 
-## Exercise 1: Identifying and Measuring Outliers
+## Exercise 1: Measuring Outliers
 
 
-```{r mc-question}
+```{r cooksd-question}
 question("What is measure of an observation's 
         overall impact on the model called? Formula = $\\large \\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$",
     answer("Cook's Distance", correct = TRUE),
     answer("Leverage", message = "Leverage measures the distance between an observation's values of the predictor variables and the 
-        average values of the predictor variables"),
+        average values of the predictor variables."),
     answer("Standardized residuals", message = "The standardized residual is the residual divided by the standard error. The residual is an observation's actual value minus the model's predicted value for that observation."), 
     answer("Residual", message = "We don't use regular residuals to measure outliers. Try again."),
     allow_retry = TRUE,  #students can try questions multiple times. 
@@ -40,7 +40,7 @@ question("What is measure of an observation's
 
 ## Exercise 2: Removing Outliers 
 
-```{r mc-question}
+```{r response-variable-outlier-question}
 question("You see some obvious outlier observations in your data set. They 
   stand out because although the values of their predictor variables are         common, the response variable values for these observations are extremely low. Can you remove these observations from your model?",
     answer("No", correct = TRUE, message = "Removing an outlier simply because of an unusual value in the response variable is NEVER a viable option. These outliers are legitimate observations and belong in your model."),
@@ -51,11 +51,11 @@ question("You see some obvious outlier observations in your data set. They
   )
 ```
 
-## Exercise 3: Identify Outliers 
+## Exercise 3: Identifying Outliers 
 
-```{r mc-question}
+```{r standardized-residual-question}
 question("An observation has a standardized residual of 2.5. Is it an outlier?",
-    answer("Yes", correct = TRUE,),
+    answer("Yes", correct = TRUE, message = "Any observation with a standardized residual less than -2 or greater than 2 is considered an outlier."),
     answer("No"),
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = FALSE #randomize answer choices
@@ -64,16 +64,25 @@ question("An observation has a standardized residual of 2.5. Is it an outlier?",
 
 ## Exercise 4: Dealing With Outliers 
 
-```{r mc-question}
+```{r deal-with-std-resid-question}
 question("An observation has a standardized residual of 2.5. Should we remove it from the model?",
-    answer("Not enough information", correct = TRUE),
+    answer("Not enough information", correct = TRUE, message = "Find out what kind of outlier it is and what kind of model you want to build, then make a decision."),
     answer("Yes", message = "It's an outlier, but we don't remove all outliers from our models."),
-    answer("No", message = "If the outlier is an influential point (it significantly pulls the model toward it) and it has an unusual predictor variable value, it may be the right thing to do to remove it."),
+    answer("No", message = "If the outlier is an influential point (it significantly pulls the model toward it) and it has an unusual predictor variable value, removing it from the model may be the right thing to do."),
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = FALSE #randomize answer choices
   )
 ```
 
-## More resources
+## Exercise 5: Better Methods for Outliers
 
-For more resources on learnr tutorials: https://rstudio.github.io/learnr/index.html
+```{r methods-question}
+question("Which of the following is/are methods to deal with outliers that may lead to a better model than simply removing the outliers?",
+    answer("Increase sample size", correct = TRUE),
+    answer("Log transformation", correct = TRUE),
+    answer("Edit the data manually to make a straight line", message = "That's not just cheating--that's lying!"), 
+    answer("Decrease sample size", message = "If anything, this will make outliers even more influential, and your model will capture less of the data."),
+    allow_retry = TRUE,  #students can try questions multiple times. 
+    random_answer_order = TRUE #randomize answer choices
+  )
+```
