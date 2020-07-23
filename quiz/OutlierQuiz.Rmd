@@ -1,0 +1,79 @@
+---
+title: "Example Quiz"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+**This is an example quiz to demostrate different question types in learnr.**
+
+```{r echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+
+```{r setup, echo = F}
+# This is any code you wan to automatically run when the user starts the quiz
+library(learnr)
+library(ggplot2)
+```
+
+## Exercise 1: Multiple choice question
+
+Consider the code below: 
+
+```{r echo = TRUE, eval = FALSE}
+ggplot(data = diamonds, aes(x = carat, y = price)) +
+  geom_point(aes(color = cut))
+```
+
+```{r mc-question}
+question("Which of the following best describes the points on the plot?",
+    answer("The shape is the same for all points.", correct = TRUE),
+    answer("The color is the same for all points.", message = "Hint: look at the aesthetic"),
+    answer("The color and shape are the same for all points.", message = "Are shape and color defined in the aesthetic?"), 
+    allow_retry = TRUE,  #students can try questions multiple times. 
+    random_answer_order = TRUE #randomize answer choices
+  )
+```
+
+## Exercise 2: Select multiple responses 
+
+```{r multi-select-quest}
+question("Which of the following best describes the points on the plot?",
+    answer("The shape is the same for all points.", correct = TRUE),
+    answer("The color is the same for all points.", message = "Hint: look at the aesthetic"),
+    answer("The color and shape are the same for all points.", message = "Are shape and color defined in the aesthetic?"), 
+    answer("The color is determined based on the cut of the diamond", correct = TRUE),
+    allow_retry = TRUE,  #students can try questions multiple times. 
+    random_answer_order = TRUE #randomize answer choices
+  )
+```
+
+## Exercise 3: Coding question 
+
+Fill in the code below to change the shape based on the clarity. 
+```{r coding-question, exercise = TRUE}
+ggplot(data = diamonds, aes(x = carat, y = price)) +
+  geom_point(aes(color = cut, shape = ___))
+```
+
+## Exercise 4: Use Latex 
+
+```{r latex-question}
+question(sprintf("Suppose we have the null hypothesis $\\mu_1 - \\mu_2 = 0$. Which is of the following is a two-sided alternative hypohteiss?"),
+  answer(sprintf("$\\mu_1 - \\mu_2 \\neq 0$"), correct = TRUE),
+  answer(sprintf("$\\mu_1 - \\mu_2 > 0$"), message = "This is one-sided"),
+  answer(sprintf("$\\mu_1 - \\mu_2 < 0$")),
+  allow_retry = TRUE,  #students can try questions multiple times. 
+    random_answer_order = TRUE #randomize answer choices
+)
+```
+
+## More resources
+
+For more resources on learnr tutorials: https://rstudio.github.io/learnr/index.html
