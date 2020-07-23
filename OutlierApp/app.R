@@ -515,7 +515,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         med4     <- "Remove middle income outlier" %in% input$solution
         high4    <- "Remove high income outliers"  %in% input$solution
         sample4 <- "Increase sample size"  %in% input$solution
-        logTrans <- "Log transform the data" %in% input$solution
+        logTrans <- "Log transform y values" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
             solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(vala), color = outlier)) + 
