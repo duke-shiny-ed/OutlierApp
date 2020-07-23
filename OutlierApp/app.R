@@ -358,19 +358,19 @@ server <- function(input, output) {
     output$outlierModel <- renderPrint({
     tab2Model <- lm(vala ~ medi, data = initialTab2)
     
-    if(is.null(input$remove)) {
-        tab2Model <- lm(vala ~ medi, data = initialTab2)
+    if(is.null(input$include)) {
+        tab2Model <- lm(vala ~ medi, data = initial)
     }
-    if(length(input$remove) == 1) {
+    if(length(input$include) == 1) {
         if (input$remove == "Middle Income Outlier") {
-            tab2Model <- lm(vala ~ medi, data = noMedTab2)
-        }
-        if(input$remove == "High Income Outliers") {
             tab2Model <- lm(vala ~ medi, data = noHighTab2)
         }
+        if(input$include == "High Income Outliers") {
+            tab2Model <- lm(vala ~ medi, data = noMedTab2)
+        }
     }
-    else if (length(input$remove == 2)){
-        tab2Model <- lm(vala ~ medi, data = initial)
+    else if (length(input$include == 2)){
+        tab2Model <- lm(vala ~ medi, data = initialTab2)
         
     }
     
