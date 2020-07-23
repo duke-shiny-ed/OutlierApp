@@ -51,24 +51,27 @@ question("You see some obvious outlier observations in your data set. They
   )
 ```
 
-## Exercise 3: Coding question 
+## Exercise 3: Identify Outliers 
 
-Fill in the code below to change the shape based on the clarity. 
-```{r coding-question, exercise = TRUE}
-ggplot(data = diamonds, aes(x = carat, y = price)) +
-  geom_point(aes(color = cut, shape = ___))
+```{r mc-question}
+question("An observation has a standardized residual of 2.5. Is it an outlier?",
+    answer("Yes", correct = TRUE,),
+    answer("No"),
+    allow_retry = TRUE,  #students can try questions multiple times. 
+    random_answer_order = FALSE #randomize answer choices
+  )
 ```
 
-## Exercise 4: Use Latex 
+## Exercise 4: Dealing With Outliers 
 
-```{r latex-question}
-question(sprintf("Suppose we have the null hypothesis $\\mu_1 - \\mu_2 = 0$. Which is of the following is a two-sided alternative hypohteiss?"),
-  answer(sprintf("$\\mu_1 - \\mu_2 \\neq 0$"), correct = TRUE),
-  answer(sprintf("$\\mu_1 - \\mu_2 > 0$"), message = "This is one-sided"),
-  answer(sprintf("$\\mu_1 - \\mu_2 < 0$")),
-  allow_retry = TRUE,  #students can try questions multiple times. 
-    random_answer_order = TRUE #randomize answer choices
-)
+```{r mc-question}
+question("An observation has a standardized residual of 2.5. Should we remove it from the model?",
+    answer("Not enough information", correct = TRUE),
+    answer("Yes", message = "It's an outlier, but we don't remove all outliers from our models."),
+    answer("No", message = "If the outlier is an influential point (it significantly pulls the model toward it) and it has an unusual predictor variable value, it may be the right thing to do to remove it."),
+    allow_retry = TRUE,  #students can try questions multiple times. 
+    random_answer_order = FALSE #randomize answer choices
+  )
 ```
 
 ## More resources
