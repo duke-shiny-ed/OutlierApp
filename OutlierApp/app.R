@@ -148,7 +148,7 @@ tags$style("
                                    tags$i("Note: Google Chrome ", tags$b("strongly"), 
                                    " recommended for best user experience."))),
                         fluidRow(
-                            column(6,
+                            column(5,
                                    h5(
                                        tags$b("Identifying Outliers")),
                                    tags$br(),
@@ -160,7 +160,7 @@ tags$style("
                                    tags$br(),
                                    tags$br()
                             ),
-                            column(6,
+                            column(5,
                                    h5(
                                        tags$b("Dealing with Outliers")),
                                    tags$br(),
@@ -273,8 +273,15 @@ tags$style("
                                                    choices = c("Remove middle income outlier",
                                                      "Remove high income outliers",
                                                      "Increase sample size",
-                                                     "Log transform y values"))
+                                                     "Log transform y values")),
+                                sidebarPanel2(
+                                  tags$br(),
+                                  tags$br(),
+                                  wellPanel(tags$b("Goal: "), "Learn acceptable methods to deal with outliers 
+                                        in a data set."))
                             ),
+                            
+                            
                             mainPanel(
                                     plotOutput("solutionsGraph"),
                                     "$R^{2}$ below:",

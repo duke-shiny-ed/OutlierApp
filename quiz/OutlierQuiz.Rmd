@@ -26,7 +26,7 @@ library(ggplot2)
 
 
 ```{r cooksd-question}
-question("What is measure of an observation's 
+question("What is the measure of an observation's 
         overall impact on the model called? Formula = $\\large \\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$",
     answer("Cook's Distance", correct = TRUE),
     answer("Leverage", message = "Leverage measures the distance between an observation's values of the predictor variables and the 
@@ -42,10 +42,10 @@ question("What is measure of an observation's
 
 ```{r response-variable-outlier-question}
 question("You see some obvious outlier observations in your data set. They 
-  stand out because although the values of their predictor variables are         common, the response variable values for these observations are extremely low. Can you remove these observations from your model?",
+  stand out because although the values of their predictor variables are         common, the response variable values for these observations are extremely low. Would it be wise to remove these observations from your model?",
     answer("No", correct = TRUE, message = "Removing an outlier simply because of an unusual value in the response variable is NEVER a viable option. These outliers are legitimate observations and belong in your model."),
     answer("Yes", message = "Do these observations have unusual predictor values or response values?"),
-    answer("It depends on the model", message = "Try again."), 
+    answer("It depends on the model", message = "Removing an outlier is never an acceptable action when it only has an unusual response variable value."), 
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = TRUE #randomize answer choices
   )
@@ -54,17 +54,14 @@ question("You see some obvious outlier observations in your data set. They
 ## Exercise 3: Identifying Outliers 
 
 ```{r standardized-residual-question}
-question("An observation has a standardized residual of 2.5. Is it an outlier?",
+quiz(question("An observation has a standardized residual of 2.5. Is it an outlier?",
     answer("Yes", correct = TRUE, message = "Any observation with a standardized residual less than -2 or greater than 2 is considered an outlier."),
-    answer("No"),
+    answer("No", message = "Any observation with a standardized residual less than -2 or greater than 2 is considered an outlier."),
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = FALSE #randomize answer choices
-  )
-```
+  ),
 
-## Exercise 4: Dealing With Outliers 
 
-```{r deal-with-std-resid-question}
 question("An observation has a standardized residual of 2.5. Should we remove it from the model?",
     answer("Not enough information", correct = TRUE, message = "Find out what kind of outlier it is and what kind of model you want to build, then make a decision."),
     answer("Yes", message = "It's an outlier, but we don't remove all outliers from our models."),
@@ -72,16 +69,17 @@ question("An observation has a standardized residual of 2.5. Should we remove it
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = FALSE #randomize answer choices
   )
+)
 ```
 
-## Exercise 5: Better Methods for Outliers
+## Exercise 4: Better Methods for Outliers
 
 ```{r methods-question}
 question("Which of the following is/are methods to deal with outliers that may lead to a better model than simply removing the outliers?",
-    answer("Increase sample size", correct = TRUE),
-    answer("Log transformation", correct = TRUE),
-    answer("Edit the data manually to make a straight line", message = "That's not just cheating--that's lying!"), 
-    answer("Decrease sample size", message = "If anything, this will make outliers even more influential, and your model will capture less of the data."),
+    answer("Increase sample size", correct = TRUE, message = "With increased sample size, it may turn out that the outliers you calculated at first aren't outliers after all."),
+    answer("Log transformation", correct = TRUE, message = "Log transformations help create linear patterns from data points that fan out from the regression line."),
+    answer("Edit the data manually to make a straight line", message = "Changing data isn't just cheating--that's lying!"), 
+    answer("Decrease sample size", message = "If anything, a smaller sample size will make outliers even more influential, and your model will capture less of the data."),
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = TRUE #randomize answer choices
   )
