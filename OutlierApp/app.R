@@ -287,7 +287,11 @@ tags$style("
                         )
                ), #end of fourth tab
                tabPanel("Quiz",
-                        "Insert Quiz"
+                        fluidRow(
+                            tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
+                                        width = "1000", height = "1500",
+                                        frameBorder="0")
+                        )
                )
     )
 )
