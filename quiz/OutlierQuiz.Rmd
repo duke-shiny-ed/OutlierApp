@@ -38,14 +38,14 @@ question("What is measure of an observation's
   )
 ```
 
-## Exercise 2: Select multiple responses 
+## Exercise 2: Removing Outliers 
 
-```{r multi-select-quest}
-question("Which of the following best describes the points on the plot?",
-    answer("The shape is the same for all points.", correct = TRUE),
-    answer("The color is the same for all points.", message = "Hint: look at the aesthetic"),
-    answer("The color and shape are the same for all points.", message = "Are shape and color defined in the aesthetic?"), 
-    answer("The color is determined based on the cut of the diamond", correct = TRUE),
+```{r mc-question}
+question("You see some obvious outlier observations in your data set. They 
+  stand out because although the values of their predictor variables are         common, the response variable values for these observations are extremely low. Can you remove these observations from your model?",
+    answer("No", correct = TRUE, message = "Removing an outlier simply because of an unusual value in the response variable is NEVER a viable option. These outliers are legitimate observations and belong in your model."),
+    answer("Yes", message = "Do these observations have unusual predictor values or response values?"),
+    answer("It depends on the model", message = "Try again."), 
     allow_retry = TRUE,  #students can try questions multiple times. 
     random_answer_order = TRUE #randomize answer choices
   )

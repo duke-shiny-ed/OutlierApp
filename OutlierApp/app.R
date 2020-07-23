@@ -273,7 +273,7 @@ tags$style("
                                                    choices = c("Remove middle income outlier",
                                                      "Remove high income outliers",
                                                      "Increase sample size",
-                                                     "Log transform the data"))
+                                                     "Log transform y values"))
                             ),
                             mainPanel(
                                     plotOutput("solutionsGraph"),
