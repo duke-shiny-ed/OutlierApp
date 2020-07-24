@@ -1,0 +1,32 @@
+/* START OF Change the Navbar Colors/Font/Size */
+/* Adjust Menu (red) text color, (Garamond) font-family, (1.5em) font-size  */
+.navbar .nav > li > a,
+.navbar .nav > li.current-menu-item > a, 
+.navbar .nav > li.current-menu-ancestor > a {
+display:        inline;
+color:          red;                        
+font-family:    Helvetica;
+font-size:      1.0rem;
+padding:        1px 1px;
+}
+
+/* Adjust Menu colors - Normal */
+.navbar .nav > li > a{
+color:          #003087;
+text-shadow:    none;
+}
+/* Adjust Menu colors - Hover */
+/*.navbar .nav > li > a:hover{ 
+color:          #003087;                      
+text-shadow:    none;
+} /*
+/* Adjust Menu colors - Active */
+.navbar .nav > li > a:active,
+.navbar .nav > li.current-menu-item > a, 
+.navbar .nav > li.current-menu-ancestor > a
+{
+color:          #003087;
+text-shadow:    none;
+}
+
+/* END OF Change the Navbar Colors/Font/Size */

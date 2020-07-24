@@ -123,6 +123,7 @@ bs_theme_fonts(
 
 # Define UI for application
 ui <- fluidPage(
+  includeCSS("styles.css"),
 # Edit style for checkboxes and radio buttons
 tags$style("
       input[type='checkbox']{ /* style for checkboxes */
@@ -185,12 +186,17 @@ tags$style("
                                    ),
                                    tags$br(),
                                    tags$br()
-                            )
+                            ), 
+                            column(2,
+                                      img(src = "DukeShinyEdLogo.png", height = 140, width = 117))
                         ), #end of second row
                         fluidRow(
-                            column(12, offset = 0.1,
-                           "Click on the next tab, 'Identify Outliers', to get started!"))),
-                           tags$br(), tags$br(), tags$br(), tags$br(), #end of third row
+                            column(10, offset = 0.1,
+                           "Click on the next tab, 'Identify Outliers', to get started!"),
+                           
+                           )
+                        ),
+                           tags$br(), tags$br(), tags$br(), tags$br(), 
                         
                         fluidRow(
                             "The data on this site is a sample from an air quality data set of California metro areas.
