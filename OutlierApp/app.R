@@ -110,7 +110,8 @@ bs_theme_add_variables(
   "card-border-color" = "#003087",
   "card-border-radius" = 0,
   "card-border-width" = "0.05rem",
-  "font-size-base" = "1.0rem"
+  "font-size-base" = "1.0rem",
+  
 )
 
 bs_theme_accent_colors(primary = "#003087", secondary = "#003087")
@@ -159,6 +160,7 @@ tags$style("
                             column(3,
                                    tags$i("Note: Google Chrome ", tags$b("strongly"), 
                                    " recommended for best user experience."))),
+                        tags$br(),
                         fluidRow(
                             column(5,
                                    h5(
@@ -207,7 +209,10 @@ tags$style("
                         sidebarLayout(position = "left",
                             sidebarPanel(
                                 h4("Identify Outliers"),
-                                span(textOutput("identifyText"), style="color:black"),
+                                "On the right, you see a simple linear model 
+                                  relating median household income and value added by businesses. Toggle the 
+                                  checkboxes below to include or exclude outliers from the model.",
+                                tags$br(),
                                 tags$br(),
                                 checkboxGroupInput("include",
                                                    "Include:",
@@ -234,7 +239,9 @@ tags$style("
                         sidebarLayout(
                             sidebarPanel(
                                 h4("Measure Outliers"),
-                                span(textOutput("measureText"), style="color:black"),
+                                "Toggle the radio buttons to learn how to calculate 
+                                  measures for outliers and what they mean.",
+                                tags$br(),
                                 tags$br(),
                                 radioButtons("measure",
                                              "Choose your measure:",
