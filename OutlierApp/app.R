@@ -143,6 +143,7 @@ tags$style("
     tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
     processEscapes: true}});"),
     navbarPage("Tabs",
+               
                tabPanel("About",
                         fluidRow(
                             column(3,
@@ -219,7 +220,6 @@ tags$style("
                                   relating median household income and value added by businesses. Toggle the 
                                   checkboxes below to include or exclude outliers from the model.",
                                 tags$br(),
-                                tags$br(),
                                 checkboxGroupInput("include",
                                                    "Include:",
                                                    c("Middle Income Outlier",
@@ -236,7 +236,8 @@ tags$style("
                             # Show a plot of the generated model
                             mainPanel(
                                 plotOutput("outlierGraph"),
-                                verbatimTextOutput("outlierModel")
+                                verbatimTextOutput("outlierModel"),
+                                tags$br()
                             ), fluid = TRUE
                         ) 
                ), #end of second tab
@@ -278,9 +279,11 @@ tags$style("
                                 tags$b("3. "), "Cook's Distance > 1",
                                 tags$br(),
                                 tags$br(),
+                                tags$b("Exercise: "), "Which observations are outliers? Click below for the answers.",
                                 checkboxInput('answerVisible', tags$i('Show true outliers'), FALSE),
                                 uiOutput('outlierAnswers')
-                                )
+                                ),
+                                tags$br()
                         )
                )
                ), #end of third tab
@@ -313,7 +316,8 @@ tags$style("
                                     tags$h4(
                                         tags$b("Did I Choose the Right Solution?")),
                                     wellPanel(htmlOutput("solutionsDescription", 
-                                                         style = "font-size: 17px"))
+                                                         style = "font-size: 17px")),
+                                    tags$br()
                             )
                         )
                ), #end of fourth tab
@@ -323,9 +327,38 @@ tags$style("
                                         width = "1000", height = "1500",
                                         frameBorder="0")
                         )
+               ), # end of fifth tab
+               tabPanel("Resources",
+                        fluidRow(
+                          h4("Further Resources")
+                          ),
+                          
+                        fluidRow(
+                          "Check out the links below to learn more about outlier detection and how to 
+                          deal with them."),
+                        tags$br(),
+
+                        fluidRow(
+                          wellPanel(
+                          tags$ul(
+                            tags$li(tags$a(href = "https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/box-whisker-plots/a/identifying-outliers-iqr-rule",
+                                           "Khan Academy - Simple Outlier Identification")),
+                            tags$li(tags$a(href = "https://towardsdatascience.com/5-ways-to-detect-outliers-that-every-data-scientist-should-know-python-code-70a54335a623",
+                                           "Towards Data Science - DBScan, Isolation Forests, Random Cut Forests")),
+                            tags$li(tags$a(href = "http://r-statistics.co/Outlier-Treatment-With-R.html",
+                                           "Advanced Outlier Tutorial in R")),
+                            tags$li(tags$a(href = "https://www.openintro.org/book/os/",
+                                           "Free Open Intro Statistics Textbook")),
+                          )
+                          ),
+                          tags$br()
+                          
+                        )
+                        )
                )
-    )
-)
+               )
+    
+
 
 # Define server logic required to draw model
 server <- function(input, output) {
