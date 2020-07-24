@@ -93,17 +93,35 @@ outlierData <- initial_aug %>% #Filter to find outliers
 trueOutliers <- outlierData$obs_num #Create vector for true outlier obs nums
 outlierString <- toString(trueOutliers)
 
-sidebarPanel2 <- function (..., out = NULL, width = 12) 
-{
-    div(class = paste0("col-sm-", width), 
-        tags$form(class = "well", ...),
-        out
-    )
-}
+# sidebarPanel2 <- function (..., out = NULL, width = 12) 
+# {
+#     div(class = paste0("col-sm-", width), 
+#         tags$form(class = "well", ...),
+#         out
+#     )
+# }
+
+bs_theme_new("4+3", bootswatch = "simplex")
+
+bs_theme_add_variables(
+  primary = "#003087",
+  secondary = "#003087",
+  #"well-bg" = "mix(#444444, #e4e4e4, 80%)"
+  "card-border-color" = "#003087",
+  "card-border-radius" = 0,
+  "card-border-width" = "0.05rem",
+  "font-size-base" = "1.0rem"
+)
+
+bs_theme_accent_colors(primary = "#003087", secondary = "#003087")
+bs_theme_fonts(
+  base = "Times",
+  code = c("Courier", "monospace"),
+  heading = "'Helvetica Neue', Helvetica, sans-serif"
+)
 
 # Define UI for application
 ui <- fluidPage(
-theme = shinytheme("simplex"),
 # Edit style for checkboxes and radio buttons
 tags$style("
       input[type='checkbox']{ /* style for checkboxes */
@@ -116,13 +134,7 @@ tags$style("
           line-height: 20px; 
       }
   "),
-    
-    tags$style(HTML("
-                    body {font-family: Arial;
-                    font-size: 16px}")),
-    tags$style(HTML("
-                    b {font-family: Arial;
-                    font-size: 16px}")),
+
     bootstraplib::bootstrap(),
     titlePanel("How to Identify and Deal with Outliers"),
     withMathJax(),
@@ -203,11 +215,11 @@ tags$style("
                                                      "High Income Outliers"), 
                                                    selected = c("Middle Income Outlier",
                                                                 "High Income Outliers")),
-                                sidebarPanel2(
+                                
                                 tags$br(),
                                 tags$br(),
-                                wellPanel(tags$b("Goal: "), "See how the model changes when you include 
-                                          and exclude outliers from the data set!")),
+                                tags$b("Goal: "), "See how the model changes when you include 
+                                          and exclude outliers from the data set!",
                             ),
                             
                             # Show a plot of the generated model
@@ -234,11 +246,10 @@ tags$style("
                                 htmlOutput("measureDefinition"),
                                 tags$br(),
                                 uiOutput("measureFormula"),
-                                sidebarPanel2(
                                     tags$br(),
                                     tags$br(),
-                                    wellPanel(tags$b("Goal: "), "Learn three methods to identify 
-                                              outliers in a data set."))
+                                    tags$b("Goal: "), "Learn three methods to identify 
+                                              outliers in a data set."
                             ),
                             mainPanel(
                                 plotOutput("measureGraph"),
@@ -274,11 +285,11 @@ tags$style("
                                                      "Remove high income outliers",
                                                      "Increase sample size",
                                                      "Log transform y values")),
-                                sidebarPanel2(
+                                
                                   tags$br(),
                                   tags$br(),
-                                  wellPanel(tags$b("Goal: "), "Learn acceptable methods to deal with outliers 
-                                        in a data set."))
+                                  tags$b("Goal: "), "Learn acceptable methods to deal with outliers 
+                                        in a data set."
                             ),
                             
                             
