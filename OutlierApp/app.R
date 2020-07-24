@@ -220,6 +220,7 @@ tags$style("
                                   relating median household income and value added by businesses. Toggle the 
                                   checkboxes below to include or exclude outliers from the model.",
                                 tags$br(),
+                                tags$br(),
                                 checkboxGroupInput("include",
                                                    "Include:",
                                                    c("Middle Income Outlier",
