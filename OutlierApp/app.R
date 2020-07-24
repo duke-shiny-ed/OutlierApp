@@ -386,11 +386,11 @@ server <- function(input, output) {
     if(is.null(input$include)) {
         tab2Model <- lm(vala ~ medi, data = initial)
     }
-    if(length(input$include) == 1) {
-        if (input$remove == "Middle Income Outlier") {
+    else if(length(input$include) == 1) {
+        if (input$include == "Middle Income Outlier") {
             tab2Model <- lm(vala ~ medi, data = noHighTab2)
         }
-        if(input$include == "High Income Outliers") {
+        else if(input$include == "High Income Outliers") {
             tab2Model <- lm(vala ~ medi, data = noMedTab2)
         }
     }
