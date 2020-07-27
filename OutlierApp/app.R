@@ -273,7 +273,7 @@ tags$style("
                                 tags$br(),
                                 "An observation can be considered an outlier if:",
                                 tags$br(),
-                                tags$b("1. "), withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of parameters + 1 and (n) is number of observations, OR"),
+                                tags$b("1. "), withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of predictor variables + 1 and (n) is number of observations, OR"),
                                 tags$br(),
                                 tags$b("2. "), "|Std. Resid.| > 2, OR",
                                 tags$br(),
@@ -315,7 +315,7 @@ tags$style("
                                     "$R^{2}$ below:",
                                     verbatimTextOutput("solutionsR2"),
                                     tags$h4(
-                                        tags$b("Did I Choose the Right Solution?")),
+                                        tags$b("Did I Choose a Reasonable Solution?")),
                                     wellPanel(htmlOutput("solutionsDescription", 
                                                          style = "font-size: 17px")),
                                     tags$br()
@@ -505,7 +505,7 @@ output$measureFormula <- renderUI({
     else {
         withMathJax(
         '$\\large D_{i}=\\frac{1}{p}(std. res._{i})^{2}(\\frac{h_{i}}{1-h_{i}})$ 
-        where (p) is the number of parameters in the model and (h) is leverage.'
+        where (p) is the number of predictor variables in the model and (h) is leverage.'
         )
     }
     
@@ -725,7 +725,9 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             description <- ". Increasing sample size and log transformation are considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is not acceptable. The medium income outlier is a legitimate 
-            observation. Note that with a larger sample size, the old high income outlier 
+            observation. The log transformation corrects for the 'fan' that 
+            came with more observations, though it does make the model more complicated 
+            to interpret. Also note that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         }
         else if (med4 & high4 & sample4){
@@ -740,21 +742,26 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             correct <- "Not quite"
             description <- ". A log transformation is acceptable here, but 
             removing an outlier because of an unusually high/low response variable is 
-            NOT acceptable. The medium income outlier is a legitimate observation."
+            NOT acceptable. The medium income outlier is a legitimate observation. Also 
+            note that the log transformation makes the model more complicated to interpret."
         } 
         else if (med4 & sample4 & logTrans){
             correct <- "Not quite"
             description <- ". Increasing sample size and log transformation are considered 
             acceptable here, but removing an outlier because of an unusually high/low 
             response variable is NOT acceptable. The medium income outlier is a legitimate 
-            observation. Good job noting that with a larger sample size, the old high income outlier 
+            observation. The log transformation corrects for the 'fan' that 
+            came with more observations, though it does make the model more complicated 
+            to interpret. Good job noting that with a larger sample size, the old high income outlier 
             is no longer an outlier. No need to exclude it!"
         } 
         else if (high4 & sample4 & logTrans) {
             correct <- "Almost"
             description <- ". Increasing sample size and log transformation are considered 
             acceptable here. Also, good job noting that the middle income outlier is a legitimate 
-            observation that you should keep. However, note that with a larger sample size, the 
+            observation that you should keep. The log transformation corrects for the 'fan' that 
+            came with more observations, though it does make the model more complicated 
+            to interpret. Note that with a larger sample size, the 
             old high income outlier is no longer an outlier. No need to exclude it!"
         }  
         else if (med4 & high4){
@@ -770,7 +777,8 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             response variable is NOT acceptable. The medium income outlier is a legitimate 
             observation. However, removing an outlier because of unusual values in a 
             predictor variable is acceptable, though the predictive range of the model 
-            will diminish."
+            will diminish. Also note that the log transformation makes the model 
+            more complicated to interpret."
         } 
         else if (med4 & sample4){
             correct <- "No!"
@@ -790,16 +798,18 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         else if(high4 & logTrans) {
             correct <- "Yes"
             description <- ", this is an acceptable solution! If for some reason, 
-            you cannot increase sample size, try a log transformation. Removing 
+            you cannot increase sample size, try a log transformation. Note that the log 
+            transformation makes the model more complicated to interpret. Removing 
             outliers with unusually high or low values in a predictor variable is 
             acceptable. Good job! Now, try to find the other acceptable solutions."
         }
         else if(sample4 & logTrans) {
             correct <- "Yes"
-            description <- ", this is the optimal solution! Good job seeing 
+            description <- ", this is a reasonable solution. Good job seeing 
             that with a larger sample size, the old high income outlier is no 
             longer an outlier. The log transformation corrects for the 'fan' that 
-            came with more observations. Try to find the other acceptable solutions."
+            came with more observations, though it does make the model more complicated 
+            to interpret. Try to find the other acceptable solutions."
         }
         else if(med4) {
             correct <- "No!"
@@ -825,7 +835,8 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         else if(logTrans) {
             correct <- "Yes"
             description <- ", this is an acceptable solution. The log transformation 
-            helps account for the outliers. But there are even better solutions! Try to 
+            helps account for the outliers. However, the model does become more complicated 
+            to interpret. There are even better solutions! Try to 
             find them."
         }
         
