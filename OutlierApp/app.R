@@ -19,8 +19,8 @@ randX2 <- runif(1, min = 11000, max= 12000) # x value for first high income outl
 randX3 <- runif(1, min = 11000, max= 12000) # x value for second high income outlier
 randX4 <- runif(1, min = 12000, max = 12000)
 randY1 <- 0
-randY2 <- runif(1, min = 13000, max = 15000)
-randY3 <- runif(1, min = 12000, max = 15000)
+randY2 <- runif(1, min = 13000, max = 16000)
+randY3 <- runif(1, min = 13000, max = 16500)
 randY4 <- runif(1, min = 400, max = 1500)
 
 determiner <- runif(1, min = 0, max = 1)
@@ -142,8 +142,7 @@ tags$style("
     withMathJax(),
     tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
     processEscapes: true}});"),
-    navbarPage("Tabs",
-               
+    navbarPage("",
                tabPanel("About",
                         fluidRow(
                             column(3,
@@ -193,7 +192,7 @@ tags$style("
                         ), #end of second row
                         fluidRow(
                             column(10, offset = 0.1,
-                           "Click on the next tab, 'Identify Outliers', to get started!"),
+                           "Click on 'Identify Outliers' in the top menu to get started!"),
                            
                            )
                         ),
@@ -219,6 +218,9 @@ tags$style("
                                 "On the right, you see a simple linear model 
                                   relating median household income and value added by businesses. Toggle the 
                                   checkboxes below to include or exclude outliers from the model.",
+                                tags$br(),
+                                tags$br(),
+                                "Outliers are in brown.",
                                 tags$br(),
                                 tags$br(),
                                 checkboxGroupInput("include",
@@ -373,7 +375,7 @@ server <- function(input, output) {
         labs(title = "Business Value Added vs. Median Income",
              x = "Median Household Income", y = "Business Value Added") + 
         geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-        xlim(0, 13000) + ylim(0, 15000) + scale_color_brewer(palette = "Dark2")
+        xlim(0, 13000) + ylim(0, 16500) + scale_color_brewer(palette = "Dark2")
 
     # Initial plot to graph when session starts
 
@@ -384,7 +386,7 @@ server <- function(input, output) {
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 15000) + 
+                xlim(0, 13000) + ylim(0, 16500) + 
                 scale_color_brewer(palette = "Dark2")
         }
         if(length(input$include) == 1) { # When one checkbox checked
@@ -394,7 +396,7 @@ server <- function(input, output) {
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added") + 
                     geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + 
+                    xlim(0, 13000) + ylim(0, 16500) + 
                     scale_color_brewer(palette = "Dark2")
             }
             if(input$include == "High Income Outliers") { #When only include High Income Outliers is checked
@@ -402,7 +404,7 @@ server <- function(input, output) {
                     labs(title = "Business Value Added vs. Median Income",
                          x = "Median Household Income", y = "Business Value Added")+ 
                     geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 15000) + 
+                    xlim(0, 13000) + ylim(0, 16500) + 
                     scale_color_brewer(palette = "Dark2")
             }
         }
@@ -411,7 +413,7 @@ server <- function(input, output) {
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
                 geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 15000) + 
+                xlim(0, 13000) + ylim(0, 16500) + 
                 scale_color_brewer(palette = "Dark2")
             
         }
@@ -527,8 +529,10 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(title = "Leverage by Observation",
                      x = "Observation Number",
                      y = "Leverage") + 
-                geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),""))) + 
-                scale_color_brewer(palette = "Dark2")
+                geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),"")),
+                          position = position_nudge(y=0.2)) + 
+                scale_color_brewer(palette = "Dark2") + 
+              annotate("text", x = 15, y = 0.235, label = "Outliers ABOVE red line")
         }
         if(input$measure == "standardizedResiduals") {
             measurePlot <- ggplot(data = initial_aug, aes(x = .fitted, y = .std.resid)) +
@@ -538,16 +542,20 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(title = "Standard Residuals vs. Predicted Value",
                      x = "Predicted",
                      y = "Standard Residuals") + 
-                geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ", as.character(obs_num)),""))) + 
-                scale_color_brewer(palette = "Dark2")
+                geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ", as.character(obs_num)),"")),
+                          position = position_nudge(y=0.2)) + 
+                scale_color_brewer(palette = "Dark2") + 
+              annotate("text", x = 1000, y = c(2.2, -2.2), label = c("Outliers ABOVE this line", "Outliers BELOW this line"))
         }
         else if(input$measure == "cooksDistance"){
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .cooksd)) +
                 geom_point(alpha = 0.7) +
                 geom_hline(yintercept=1,color = "red") +
                 labs(x = "Observation Number", y = "Cook's Distance", title = "Cook's Distance") + 
-                geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),""))) + 
-                scale_color_brewer(palette = "Dark2")
+                geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),"")),
+                          position = position_nudge(y=0.1)) + 
+                scale_color_brewer(palette = "Dark2") + 
+              annotate("text", x = 15, y = 1.05, label = "Outliers ABOVE red line")
         }
         
         measurePlot
@@ -574,7 +582,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "(Unchanged) Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2") + xlim(0, 13000) + ylim(0, 16500)
         }
         
         med4     <- "Remove middle income outlier" %in% input$solution
@@ -595,7 +603,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)+ 
+                xlim(0, 13000) + ylim(0, 16500)+ 
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & high4 & logTrans){
@@ -627,7 +635,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000) + 
+                xlim(0, 13000) + ylim(0, 16500) + 
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & logTrans){
@@ -643,7 +651,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)+ 
+                xlim(0, 13000) + ylim(0, 16500)+ 
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (high4 & sample4) {
@@ -651,7 +659,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)+ 
+                xlim(0, 13000) + ylim(0, 16500)+ 
                 scale_color_brewer(palette = "Dark2")
         }  
         else if(high4 & logTrans) {
@@ -675,7 +683,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)+ 
+                xlim(0, 13000) + ylim(0, 16500)+ 
                 scale_color_brewer(palette = "Dark2")
         }
         else if(high4) {
@@ -683,7 +691,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)+ 
+                xlim(0, 13000) + ylim(0, 16500)+ 
                 scale_color_brewer(palette = "Dark2")
         }
         else if(sample4) {
@@ -691,7 +699,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 15000)+ 
+                xlim(0, 13000) + ylim(0, 16500)+ 
                 scale_color_brewer(palette = "Dark2")
         }
         else if(logTrans) {
