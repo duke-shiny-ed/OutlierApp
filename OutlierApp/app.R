@@ -217,10 +217,8 @@ tags$style("
                                 h4("Identify Outliers"),
                                 "On the right, you see a simple linear model 
                                   relating median household income and value added by businesses. Toggle the 
-                                  checkboxes below to include or exclude outliers from the model.",
-                                tags$br(),
-                                tags$br(),
-                                "Outliers are in brown.",
+                                  checkboxes below to include or exclude outliers from the model.", 
+                                tags$i("Outliers are in brown."),
                                 tags$br(),
                                 tags$br(),
                                 checkboxGroupInput("include",
@@ -231,10 +229,20 @@ tags$style("
                                                                 "High Income Outliers")),
                                 
                                 tags$br(),
-                                tags$br(),
-                                tags$b("Goal: "), "See how the model changes when you include 
-                                          and exclude outliers from the data set!",
+                                tags$b("Exercise: "), "When the high income
+                                outliers are excluded from the model, 
+                                what happens to the slope of the regression 
+                                line?",
+
+                                radioButtons("identifyExercise", "",
+                                             choices = 
+                                               c("Slope increases" = "slopeIncrease",
+                                                 "Slope falls" = "slopeFall",
+                                                 "Slope remains constant"),
+                                             selected = character(0)),
+                                span(textOutput("identifyExerciseAnswer"), style = "font-style: italics")
                             ),
+                            
                             
                             # Show a plot of the generated model
                             mainPanel(
@@ -447,6 +455,28 @@ server <- function(input, output) {
    
      })
 
+    #Start of identifyExerciseAnswer code
+    output$identifyExerciseAnswer <- renderText({
+      answer <- ""
+      if (is.null(input$identifyExercise)) {
+        answer <- "Select an option"
+      }
+      else if(input$identifyExercise == "slopeIncrease") {
+        answer <- "No. Hint: Does the model coefficient 'medi' increase, decrease, or stay the same?"
+      }
+      else if(input$identifyExercise == "slopeFall") {
+        answer <- "Correct!"
+      }
+      else {
+        answer <- "No. Hint: Does the model coefficient 'medi' increase or decrease?"
+      }
+      
+      answer
+      
+    })
+    
+    # End of identifyExerciseAnswer code
+    
 # End of tab 2 code
     
 # Start of tab 3 code
