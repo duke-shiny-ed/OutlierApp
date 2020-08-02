@@ -15,16 +15,16 @@ initial$outlier <- c(rep("no", 23))
 
 
 randX1 <- runif(1, min = 5500, max=7000) # x value for mid income outlier
-randX2 <- runif(1, min = 11000, max= 12000) # x value for first high income outlier
-randX3 <- runif(1, min = 11000, max= 12000) # x value for second high income outlier
-randX4 <- runif(1, min = 12000, max = 12000)
+randX2 <- runif(1, min = 11000, max= 13000) # x value for first high income outlier
+randX3 <- runif(1, min = 12000, max= 13000) # x value for second high income outlier
+randX4 <- runif(1, min = 12000, max = 13000)
 randY1 <- 0
 randY2 <- runif(1, min = 13000, max = 16000)
 randY3 <- runif(1, min = 13000, max = 16500)
 randY4 <- runif(1, min = 400, max = 1500)
 
 determiner <- runif(1, min = 0, max = 1)
-ifelse (determiner<0.5, randY1 <- runif(1, min = 50, max = 100),
+ifelse (determiner<0.5, randY1 <- runif(1, min = 25, max = 75),
                                         randY1 <- runif(1, min = 10000, max = 11000))
 
 df1 = data.frame(X = c(31:34), airq = c(rep(1, 4)), vala = c(randY1, randY2, randY3, randY4), 
@@ -560,7 +560,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                      x = "Observation Number",
                      y = "Leverage") + 
                 geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),"")),
-                          position = position_nudge(y=0.2)) + 
+                          position = position_nudge(y=0.005)) + 
                 scale_color_brewer(palette = "Dark2") + 
               annotate("text", x = 15, y = 0.235, label = "Outliers ABOVE red line")
         }
