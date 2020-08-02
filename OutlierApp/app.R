@@ -116,9 +116,9 @@ bs_theme_add_variables(
 
 bs_theme_accent_colors(primary = "#003087", secondary = "#003087")
 bs_theme_fonts(
-  base = "Times",
+  base = "Georgia",
   code = c("Courier", "monospace"),
-  heading = "'Helvetica Neue', Helvetica, sans-serif"
+  heading = "'Arial', sans-serif"
 )
 
 # Define UI for application
@@ -240,7 +240,7 @@ tags$style("
                                                  "Slope falls" = "slopeFall",
                                                  "Slope remains constant"),
                                              selected = character(0)),
-                                span(textOutput("identifyExerciseAnswer"), style = "font-style: italics")
+                                span(htmlOutput("identifyExerciseAnswer"), style = "font-weight: bold")
                             ),
                             
                             
