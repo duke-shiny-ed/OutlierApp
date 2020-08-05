@@ -14,15 +14,16 @@ initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
 
 
-randX1 <- runif(1, min = 5500, max=7000) # x value for mid income outlier
+randX1 <- runif(1, min = 5500, max=7000) # random x value for mid income outlier
 randX2 <- runif(1, min = 11000, max= 13000) # x value for first high income outlier
 randX3 <- runif(1, min = 12000, max= 13000) # x value for second high income outlier
-randX4 <- runif(1, min = 12000, max = 13000)
+randX4 <- runif(1, min = 12000, max = 13000) # x value for third high income outlier
 randY1 <- 0
 randY2 <- runif(1, min = 13000, max = 16000)
 randY3 <- runif(1, min = 13000, max = 16500)
 randY4 <- runif(1, min = 400, max = 1500)
 
+# Flip coin to see if middle income outlier has unusually high or low vala
 determiner <- runif(1, min = 0, max = 1)
 ifelse (determiner<0.5, randY1 <- runif(1, min = 25, max = 75),
                                         randY1 <- runif(1, min = 10000, max = 11000))
@@ -39,14 +40,15 @@ df3 = data.frame(X = c(32:34), airq = c(rep(1, 3)), vala = c(randY2, randY3, ran
                  rain = c(rep(1, 3)), coas = c(rep("yes", 3)), dens = c(rep(1, 3)), 
                  medi = c(randX2, randX3, randX4), outlier = rep("yes", 3)) # Create data frame for noMedTab2
 
-initialTab2 <- rbind(initial, df1)
+initialTab2 <- rbind(initial, df1) # data frame with all outliers included
 
-noHighTab2 <- rbind(initial, df2)
+noHighTab2 <- rbind(initial, df2) # data frame with no high income outliers
 
-noMedTab2 <- rbind(initial, df3)
+noMedTab2 <- rbind(initial, df3) # data frame with no medium income outliers
 
 set.seed(33)
 
+# Shuffle row numbers
 initialTab2Rows <- sample(nrow(initialTab2))
 noHighTab2Rows <- sample(nrow(noHighTab2))
 noMedTab2Rows <- sample(nrow(noMedTab2))
@@ -101,6 +103,7 @@ outlierString <- toString(trueOutliers)
 #     )
 # }
 
+# Style with BootstrapLib
 bs_theme_new("4+3", bootswatch = "simplex")
 
 bs_theme_add_variables(
@@ -281,7 +284,8 @@ tags$style("
                                 wellPanel(
                                 tags$b("Common Thresholds for Outliers"),
                                 tags$br(),
-                                "An observation can be considered an outlier if:",
+                                "An observation can be considered an outlier if at least one of these conditions is satisfied:",
+                                tags$br(),
                                 tags$br(),
                                 tags$b("1. "), withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of predictor variables + 1 and (n) is number of observations, OR"),
                                 tags$br(),
@@ -290,9 +294,9 @@ tags$style("
                                 tags$b("3. "), "Cook's Distance > 1",
                                 tags$br(),
                                 tags$br(),
-                                tags$b("Exercise: "), "Which observations are outliers? Click below for the answers.",
-                                checkboxInput('answerVisible', tags$i('Show true outliers'), FALSE),
-                                uiOutput('outlierAnswers')
+                                tags$b("Exercise: "), "Which observations are outliers? Labeled points are the answers.",
+                               # checkboxInput('answerVisible', tags$i('Show true outliers'), FALSE),
+                               # uiOutput('outlierAnswers')
                                 ),
                                 tags$br()
                         )
@@ -364,10 +368,10 @@ tags$style("
                           ),
                           tags$br()
                           
-                        )
-                        )
-               )
-               )
+                        ) # End of fluidRow
+                        ) # End of sixth tab
+               ) # End of navBarPage
+               ) # End of UI
     
 
 
@@ -387,7 +391,7 @@ server <- function(input, output) {
 
     # Initial plot to graph when session starts
 
-    
+    # Start of outlierGraph code
     output$outlierGraph <- renderPlot({
         if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
             g <- ggplot(data=initial, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
@@ -428,8 +432,9 @@ server <- function(input, output) {
         g
 
     })
-
+    #End of outlierGraph code
     
+    #Start of outlierModel code
     output$outlierModel <- renderPrint({
     tab2Model <- lm(vala ~ medi, data = initialTab2)
     
@@ -454,7 +459,8 @@ server <- function(input, output) {
         kable(format = "markdown", digits = 3)
    
      })
-
+    #End of outlierModel code
+    
     #Start of identifyExerciseAnswer code
     output$identifyExerciseAnswer <- renderText({
       answer <- ""
@@ -514,10 +520,10 @@ output$measureDefinition <- renderText({
 })
 
 #Code for outlierAnswers below
-output$outlierAnswers <- renderUI({
-    if (!input$answerVisible) return()
-    paste0("True outliers in this data set are observations ", outlierString)
-})
+# output$outlierAnswers <- renderUI({
+#     if (!input$answerVisible) return()
+#     paste0("True outliers in this data set are observations ", outlierString)
+# })
 
 # Code for measureFormula below
 formula = ''
@@ -562,7 +568,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),"")),
                           position = position_nudge(y=0.005)) + 
                 scale_color_brewer(palette = "Dark2") + 
-              annotate("text", x = 15, y = 0.235, label = "Outliers ABOVE red line")
+              annotate("text", x = 15, y = 0.2302, label = "Outliers ABOVE red line")
         }
         if(input$measure == "standardizedResiduals") {
             measurePlot <- ggplot(data = initial_aug, aes(x = .fitted, y = .std.resid)) +
