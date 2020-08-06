@@ -5,8 +5,8 @@ account: glenmorgenstern
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2599692
-bundleId: 3464421
+bundleId: 3483106
 url: https://glenmorgenstern.shinyapps.io/OutlierApp/
-when: 1596339933.54386
+when: 1596731025.07832
 asMultiple: FALSE
 asStatic: FALSE
