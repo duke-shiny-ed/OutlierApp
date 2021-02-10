@@ -7,7 +7,7 @@ library(broom)
 library(RColorBrewer)
 library(learnr)
 library(shinythemes)
-library(bootstraplib)
+library(bslib)
 library(shinyBS)
 
 initial <- read_csv("data/airq-no-outliers.csv")
@@ -104,7 +104,7 @@ outlierString <- toString(trueOutliers)
 # }
 
 # Style with BootstrapLib
-bs_theme_new("4+3", bootswatch = "simplex")
+bs_theme_new("4", bootswatch = "simplex")
 
 bs_theme_add_variables(
   primary = "#003087",
@@ -140,7 +140,7 @@ tags$style("
       }
   "),
 
-    bootstraplib::bootstrap(),
+    #bootstraplib::bootstrap(),
     titlePanel("How to Identify and Deal with Outliers"),
     withMathJax(),
     tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
@@ -249,8 +249,10 @@ tags$style("
                             
                             # Show a plot of the generated model
                             mainPanel(
-                                plotOutput("outlierGraph"),
+                                plotOutput("outlierGraph", click = "plot_click"),
                                 verbatimTextOutput("outlierModel"),
+                                ##verbatimTextOutput("clickInfo"),
+                                ##actionButton("updateplot", "Update Plot:"),
                                 tags$br()
                             ), fluid = TRUE
                         ) 
@@ -390,7 +392,15 @@ server <- function(input, output) {
         xlim(0, 13000) + ylim(0, 16500) + scale_color_brewer(palette = "Dark2")
 
     # Initial plot to graph when session starts
-
+    # trying to add interactivity to add points to graph on click
+    # val <- reactiveValues(clickx = NULL, clicky = NULL)
+    # observe({
+    #   input$plot_click
+    #   isolate({
+    #     val$clickx = c(val$clickx, input$plot_click$x)
+    #     val$clicky = c(val$clicky, input$plot_click$y)     
+    #   })
+    # })
     # Start of outlierGraph code
     output$outlierGraph <- renderPlot({
         if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
@@ -430,6 +440,13 @@ server <- function(input, output) {
             
         }
         g
+        # input$updateplot
+        # isolate({
+        #   points(val$clickx, val$clicky)
+        # })
+        # output$clickinfo <- renderText({
+        #   paste0("x = ", val$clickx, ", y = ",val$clicky, "\n")
+        # })
 
     })
     #End of outlierGraph code
