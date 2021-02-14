@@ -251,8 +251,7 @@ tags$style("
                             mainPanel(
                                 plotOutput("outlierGraph", click = "plot_click"),
                                 verbatimTextOutput("outlierModel"),
-                                ##verbatimTextOutput("clickInfo"),
-                                ##actionButton("updateplot", "Update Plot:"),
+                                verbatimTextOutput("clickInfo"),
                                 tags$br()
                             ), fluid = TRUE
                         ) 
@@ -392,84 +391,108 @@ server <- function(input, output) {
         xlim(0, 13000) + ylim(0, 16500) + scale_color_brewer(palette = "Dark2")
 
     # Initial plot to graph when session starts
-    # trying to add interactivity to add points to graph on click
-    # val <- reactiveValues(clickx = NULL, clicky = NULL)
-    # observe({
-    #   input$plot_click
-    #   isolate({
-    #     val$clickx = c(val$clickx, input$plot_click$x)
-    #     val$clicky = c(val$clicky, input$plot_click$y)     
-    #   })
-    # })
+    
+    # creating reactive dataframe
+    
+    values <- reactiveValues()
+    values$DT <- data.frame(medi = numeric(),
+                            vala = numeric()
+                            )
+    
+    
+    
     # Start of outlierGraph code
     output$outlierGraph <- renderPlot({
-        if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
-            g <- ggplot(data=initial, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
+        #if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
+            ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+                geom_point(data=values$DT, size = 2, aes(x=medi, y=vala))+
+                geom_smooth(data = values$DT, method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
                 xlim(0, 13000) + ylim(0, 16500) + 
                 scale_color_brewer(palette = "Dark2")
-        }
-        if(length(input$include) == 1) { # When one checkbox checked
-            
-            if (input$include == "Middle Income Outlier") { # When only include Middle Income Outlier checked
-                g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
-                    labs(title = "Business Value Added vs. Median Income",
-                         x = "Median Household Income", y = "Business Value Added") + 
-                    geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 16500) + 
-                    scale_color_brewer(palette = "Dark2")
-            }
-            if(input$include == "High Income Outliers") { #When only include High Income Outliers is checked
-                g <- ggplot(data=noMedTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
-                    labs(title = "Business Value Added vs. Median Income",
-                         x = "Median Household Income", y = "Business Value Added")+ 
-                    geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
-                    xlim(0, 13000) + ylim(0, 16500) + 
-                    scale_color_brewer(palette = "Dark2")
-            }
-        }
-        else if (length(input$include == 2)){ # When both checkboxes are checked, use initialTab2 dataframe
-            g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
-                labs(title = "Business Value Added vs. Median Income",
-                     x = "Median Household Income", y = "Business Value Added") + 
-                geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 16500) + 
-                scale_color_brewer(palette = "Dark2")
-            
-        }
-        g
-        # input$updateplot
-        # isolate({
-        #   points(val$clickx, val$clicky)
-        # })
-        # output$clickinfo <- renderText({
-        #   paste0("x = ", val$clickx, ", y = ",val$clicky, "\n")
-        # })
+        #}
+        # if(length(input$include) == 1) { # When one checkbox checked
+        #     
+        #     if (input$include == "Middle Income Outlier") { # When only include Middle Income Outlier checked
+        #         g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        #             labs(title = "Business Value Added vs. Median Income",
+        #                  x = "Median Household Income", y = "Business Value Added") + 
+        #             geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+        #             xlim(0, 13000) + ylim(0, 16500) + 
+        #             scale_color_brewer(palette = "Dark2")
+        #     }
+        #     if(input$include == "High Income Outliers") { #When only include High Income Outliers is checked
+        #         g <- ggplot(data=noMedTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        #             labs(title = "Business Value Added vs. Median Income",
+        #                  x = "Median Household Income", y = "Business Value Added")+ 
+        #             geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
+        #             xlim(0, 13000) + ylim(0, 16500) + 
+        #             scale_color_brewer(palette = "Dark2")
+        #     }
+        # }
+        # else if (length(input$include == 2)){ # When both checkboxes are checked, use initialTab2 dataframe
+        #     g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        #         labs(title = "Business Value Added vs. Median Income",
+        #              x = "Median Household Income", y = "Business Value Added") + 
+        #         geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+        #         xlim(0, 13000) + ylim(0, 16500) + 
+        #         scale_color_brewer(palette = "Dark2")
+        #     
+        # }
+        
+        
+        
 
     })
     #End of outlierGraph code
     
+    #code to add new entry in dataframe upon clicking plot
+    
+    observeEvent(input$plot_click, {
+      # each input is a factor so levels are consistent for plotting characteristics
+      add_row <- data.frame(medi = input$plot_click$x,
+                            vala = input$plot_click$y
+                           )
+      # add row to the data.frame
+      values$DT <- rbind(values$DT, add_row)
+    })
+    
+    #function to combine data frames for this tab
+    
+    rbind.match.columns <- function(input1, input2) {
+      n.input1 <- ncol(input1)
+      n.input2 <- ncol(input2)
+      if (n.input2 < n.input1) {
+        TF.names <- which(names(input2) %in% names(input1))
+        column.names <- names(input2[, TF.names])
+      } else {
+        TF.names <- which(names(input1) %in% names(input2))
+        column.names <- names(input1[, TF.names])
+      }
+      return(rbind(input1[, column.names], input2[, column.names]))
+    }
+    
     #Start of outlierModel code
     output$outlierModel <- renderPrint({
+    initialTab2 <- rbind.match.columns(initialTab2,values$DT)
     tab2Model <- lm(vala ~ medi, data = initialTab2)
     
-    if(is.null(input$include)) {
-        tab2Model <- lm(vala ~ medi, data = initial)
-    }
-    else if(length(input$include) == 1) {
-        if (input$include == "Middle Income Outlier") {
-            tab2Model <- lm(vala ~ medi, data = noHighTab2)
-        }
-        else if(input$include == "High Income Outliers") {
-            tab2Model <- lm(vala ~ medi, data = noMedTab2)
-        }
-    }
-    else if (length(input$include == 2)){
-        tab2Model <- lm(vala ~ medi, data = initialTab2)
-        
-    }
+    # if(is.null(input$include)) {
+    #     tab2Model <- lm(vala ~ medi, data = initial)
+    # }
+    # else if(length(input$include) == 1) {
+    #     if (input$include == "Middle Income Outlier") {
+    #         tab2Model <- lm(vala ~ medi, data = noHighTab2)
+    #     }
+    #     else if(input$include == "High Income Outliers") {
+    #         tab2Model <- lm(vala ~ medi, data = noMedTab2)
+    #     }
+    # }
+    # else if (length(input$include == 2)){
+    #     tab2Model <- lm(vala ~ medi, data = initialTab2)
+    #     
+    # }
     
     tab2Model %>%
         tidy(conf.int = TRUE) %>%
