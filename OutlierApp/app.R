@@ -217,33 +217,33 @@ tags$style("
                         # Sidebar with checkboxes
                         sidebarLayout(position = "left",
                             sidebarPanel(
-                                h4("Identify Outliers"),
-                                "On the right, you see a simple linear model 
-                                  relating median household income and value added by businesses. Toggle the 
-                                  checkboxes below to include or exclude outliers from the model.", 
-                                tags$i("Outliers are in brown."),
-                                tags$br(),
-                                tags$br(),
-                                checkboxGroupInput("include",
-                                                   "Include:",
-                                                   c("Middle Income Outlier",
-                                                     "High Income Outliers"), 
-                                                   selected = c("Middle Income Outlier",
-                                                                "High Income Outliers")),
-                                
-                                tags$br(),
-                                tags$b("Exercise: "), "When the high income
-                                outliers are excluded from the model, 
-                                what happens to the slope of the regression 
-                                line?",
-
-                                radioButtons("identifyExercise", "",
-                                             choices = 
-                                               c("Slope increases" = "slopeIncrease",
-                                                 "Slope falls" = "slopeFall",
-                                                 "Slope remains constant"),
-                                             selected = character(0)),
-                                span(htmlOutput("identifyExerciseAnswer"), style = "font-weight: bold")
+                                # h4("Identify Outliers"),
+                                # "On the right, you see a simple linear model 
+                                #   relating median household income and value added by businesses. Toggle the 
+                                #   checkboxes below to include or exclude outliers from the model.", 
+                                # tags$i("Outliers are in brown."),
+                                # tags$br(),
+                                # tags$br(),
+                                # checkboxGroupInput("include",
+                                #                    "Include:",
+                                #                    c("Middle Income Outlier",
+                                #                      "High Income Outliers"), 
+                                #                    selected = c("Middle Income Outlier",
+                                #                                 "High Income Outliers")),
+                                # 
+                                # tags$br(),
+                                # tags$b("Exercise: "), "When the high income
+                                # outliers are excluded from the model, 
+                                # what happens to the slope of the regression 
+                                # line?",
+                                # 
+                                # radioButtons("identifyExercise", "",
+                                #              choices = 
+                                #                c("Slope increases" = "slopeIncrease",
+                                #                  "Slope falls" = "slopeFall",
+                                #                  "Slope remains constant"),
+                                #              selected = character(0)),
+                                # span(htmlOutput("identifyExerciseAnswer"), style = "font-weight: bold")
                             ),
                             
                             
@@ -380,15 +380,15 @@ tags$style("
 server <- function(input, output) {
 
 #Start of tab 2 code
-    output$identifyText <- renderText({"On the right, you see a simple linear model 
-        relating median household income and value added by businesses. Toggle the 
-        checkboxes below to include or exclude outliers from the model."})
+    # output$identifyText <- renderText({"On the right, you see a simple linear model 
+    #     relating median household income and value added by businesses. Toggle the 
+    #     checkboxes below to include or exclude outliers from the model."})
     
-    g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
-        labs(title = "Business Value Added vs. Median Income",
-             x = "Median Household Income", y = "Business Value Added") + 
-        geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
-        xlim(0, 13000) + ylim(0, 16500) + scale_color_brewer(palette = "Dark2")
+    # g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
+    #     labs(title = "Business Value Added vs. Median Income",
+    #          x = "Median Household Income", y = "Business Value Added") + 
+    #     geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+    #     xlim(0, 13000) + ylim(0, 16500) + scale_color_brewer(palette = "Dark2")
 
     # Initial plot to graph when session starts
     
@@ -404,13 +404,17 @@ server <- function(input, output) {
     # Start of outlierGraph code
     output$outlierGraph <- renderPlot({
         #if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
-            ggplot(data=initial, aes(x=medi, y=vala)) + geom_point() + 
+            static <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income", y = "Business Value Added") + 
-                geom_point(data=values$DT, size = 2, aes(x=medi, y=vala))+
-                geom_smooth(data = values$DT, method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
+              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray")  
+        #this next line adds the new values on
+            initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
+             replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=vala), color = "red") +
+                geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "black") + 
                 xlim(0, 13000) + ylim(0, 16500) + 
                 scale_color_brewer(palette = "Dark2")
+            replot
         #}
         # if(length(input$include) == 1) { # When one checkbox checked
         #     
@@ -475,8 +479,8 @@ server <- function(input, output) {
     
     #Start of outlierModel code
     output$outlierModel <- renderPrint({
-    initialTab2 <- rbind.match.columns(initialTab2,values$DT)
-    tab2Model <- lm(vala ~ medi, data = initialTab2)
+    initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
+    tab2Model <- lm(vala ~ medi, data = initialTab2) #model statistics on the bottom
     
     # if(is.null(input$include)) {
     #     tab2Model <- lm(vala ~ medi, data = initial)
