@@ -252,6 +252,7 @@ tags$style("
                                 plotOutput("outlierGraph", click = "plot_click"),
                                 verbatimTextOutput("outlierModel"),
                                 verbatimTextOutput("clickInfo"),
+                                actionButton("reset", label = "Reset to Original"),
                                 tags$br()
                             ), fluid = TRUE
                         ) 
@@ -461,6 +462,10 @@ server <- function(input, output) {
       # add row to the data.frame
       values$DT <- rbind(values$DT, add_row)
     })
+    #reset points to original
+    observeEvent(input$reset, {
+      values$DT <- values$DT[0,]
+    })
     
     #function to combine data frames for this tab
     
@@ -602,6 +607,20 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
          y = "Leverage")
 
     output$measureGraph <- renderPlot({
+      initialTab2 <- rbind.match.columns(initialTab2,values$DT)
+      initialModel <- lm(vala ~ medi, data = initialTab2)
+
+      initial_aug <- augment(initialModel) %>%
+        mutate(obs_num = row_number())
+
+      leverageThresh = 2*(2 + 1) / nrow(initial_aug) # define leverage threshold
+
+      outlierData <- initial_aug %>% #Filter to find outliers
+         filter(.cooksd > 1 | abs(.std.resid) > 2 | .hat > leverageThresh)
+      
+       trueOutliers <- outlierData$obs_num #Create vector for true outlier obs nums
+       outlierString <- toString(trueOutliers)
+      
         if(input$measure == "leverage") {
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() +
