@@ -250,6 +250,9 @@ tags$style("
                             # Show a plot of the generated model
                             mainPanel(
                                 plotOutput("outlierGraph", click = "plot_click"),
+                                tags$li("Original Model"),
+                                verbatimTextOutput("staticModel"),
+                                tags$li("User Augmented Model"),
                                 verbatimTextOutput("outlierModel"),
                                 verbatimTextOutput("clickInfo"),
                                 actionButton("reset", label = "Reset to Original"),
@@ -413,7 +416,7 @@ server <- function(input, output) {
             initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
              replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=vala), color = "red") +
                 geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "black") + 
-                xlim(0, 13000) + ylim(0, 16500) + 
+                xlim(0, 15000) + ylim(0, 25000) + 
                 scale_color_brewer(palette = "Dark2")
             replot
         #}
@@ -508,6 +511,14 @@ server <- function(input, output) {
         kable(format = "markdown", digits = 3)
    
      })
+    output$staticModel <- renderPrint({
+      tab2Modelstatic <- lm(vala ~ medi, data = initialTab2) #model statistics on the bottom
+      
+      tab2Modelstatic %>%
+        tidy(conf.int = TRUE) %>%
+        kable(format = "markdown", digits = 3)
+      
+    })
     #End of outlierModel code
     
     #Start of identifyExerciseAnswer code
@@ -625,13 +636,15 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() +
                 geom_hline(yintercept = leverageThresh, color = "red") +
+                geom_vline(xintercept = 27.5, color = "red")+
                 labs(title = "Leverage by Observation",
                      x = "Observation Number",
                      y = "Leverage") + 
                 geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),"")),
                           position = position_nudge(y=0.005)) + 
                 scale_color_brewer(palette = "Dark2") + 
-              annotate("text", x = 15, y = 0.2302, label = "Outliers ABOVE red line")
+              annotate("text", x = 15, y = 0.2302, label = "Outliers ABOVE red line")+
+              annotate("text", x=23, y = 0.13, label = "added points RIGHT of line")
         }
         if(input$measure == "standardizedResiduals") {
             measurePlot <- ggplot(data = initial_aug, aes(x = .fitted, y = .std.resid)) +
@@ -650,11 +663,13 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .cooksd)) +
                 geom_point(alpha = 0.7) +
                 geom_hline(yintercept=1,color = "red") +
+                geom_vline(xintercept = 27.5, color = "red")+
                 labs(x = "Observation Number", y = "Cook's Distance", title = "Cook's Distance") + 
                 geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),"")),
                           position = position_nudge(y=0.1)) + 
                 scale_color_brewer(palette = "Dark2") + 
-              annotate("text", x = 15, y = 1.05, label = "Outliers ABOVE red line")
+              annotate("text", x = 15, y = 1.05, label = "Outliers ABOVE red line")+
+              annotate("text", x=23, y = 1.5, label = "added points RIGHT of line")
         }
         
         measurePlot
