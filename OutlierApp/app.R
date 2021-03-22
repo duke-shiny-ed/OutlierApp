@@ -125,93 +125,95 @@ bs_theme_fonts(
 )
 
 # Define UI for application
-ui <- fluidPage(
-  includeCSS("styles.css"),
+ui <- navbarPage(
+  theme = shinytheme("lumen"),
+  title = "Outliers",
+  ##includeCSS("styles.css"),
 # Edit style for checkboxes and radio buttons
-tags$style("
-      input[type='checkbox']{ /* style for checkboxes */
-        width: 10px; /*Desired width*/
-        height: 10px; /*Desired height*/
-        line-height: 8px; 
-      }
-      span { 
-          margin-left: 5px;  /*set the margin, so boxes don't overlap labels*/
-          line-height: 20px; 
-      }
-  "),
+# tags$style("
+#       input[type='checkbox']{ /* style for checkboxes */
+#         width: 10px; /*Desired width*/
+#         height: 10px; /*Desired height*/
+#         line-height: 8px; 
+#       }
+#       span { 
+#           margin-left: 5px;  /*set the margin, so boxes don't overlap labels*/
+#           line-height: 20px; 
+#       }
+#   "),
 
     #bootstraplib::bootstrap(),
-    titlePanel("How to Identify and Deal with Outliers"),
-    withMathJax(),
-    tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
+            tabPanel("About",
+                     withMathJax(),
+                     tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
     processEscapes: true}});"),
-    navbarPage("",
-               tabPanel("About",
+                      fluidRow(
+                        column(3,
+                               h2("About")
+                        )
+                      ), # end of title row
+                      wellPanel(
                         fluidRow(
-                            column(3,
-                                   h2("About")
-                            )
-                        ), # end of title row
-                        wellPanel(
-                        fluidRow(
-                            column(9, offset = 0.1,
-                            "Outliers can be tricky to pin down. Once you've figured out where 
+                          column(9, offset = 0.1,
+                                 "Outliers can be tricky to pin down. Once you've figured out where 
                             your outliers are, it's hard to know what do with them. In this app, 
                             you will learn methods for recognizing and treating outliers in your 
                             data. These include:",
-                            style='border-right: 1px solid red'
-                        ),
-                            column(3,
-                                   tags$i("Note: Google Chrome ", tags$b("strongly"), 
-                                   " recommended for best user experience."))),
+                                 style='border-right: 1px solid red'
+                          ),
+                          column(3,
+                                 tags$i("Note: Google Chrome ", tags$b("strongly"), 
+                                        " recommended for best user experience."))),
                         tags$br(),
                         fluidRow(
-                            column(5,
-                                   h5(
-                                       tags$b("Identifying Outliers")),
-                                   tags$br(),
-                                   tags$ul(
-                                       tags$li("Leverage"),
-                                       tags$li("Standardized residuals"),
-                                       tags$li("Cook's Distance")
-                                   ),
-                                   tags$br(),
-                                   tags$br()
-                            ),
-                            column(5,
-                                   h5(
-                                       tags$b("Dealing with Outliers")),
-                                   tags$br(),
-                                   tags$ul(
-                                       tags$li("Transforming the data"),
-                                       tags$li("Increasing sample size"),
-                                       tags$li("Removing outliers")
-                                   ),
-                                   tags$br(),
-                                   tags$br()
-                            ), 
-                            column(2,
-                                      img(src = "DukeShinyEdLogo.png", height = 140, width = 117))
+                          column(5,
+                                 h5(
+                                   tags$b("Identifying Outliers")),
+                                 tags$br(),
+                                 tags$ul(
+                                   tags$li("Leverage"),
+                                   tags$li("Standardized residuals"),
+                                   tags$li("Cook's Distance")
+                                 ),
+                                 tags$br(),
+                                 tags$br()
+                          ),
+                          column(5,
+                                 h5(
+                                   tags$b("Dealing with Outliers")),
+                                 tags$br(),
+                                 tags$ul(
+                                   tags$li("Transforming the data"),
+                                   tags$li("Increasing sample size"),
+                                   tags$li("Removing outliers")
+                                 ),
+                                 tags$br(),
+                                 tags$br()
+                          ), 
+                          column(2,
+                                 img(src = "DukeShinyEdLogo.png", height = 140, width = 117))
                         ), #end of second row
                         fluidRow(
-                            column(10, offset = 0.1,
-                           "Click on 'Identify Outliers' in the top menu to get started!"),
-                           
-                           )
-                        ),
-                           tags$br(), tags$br(), tags$br(), tags$br(), 
-                        
-                        fluidRow(
-                            "The data on this site is a sample from an air quality data set of California metro areas.
+                          column(10, offset = 0.1,
+                                 "Click on 'Identify Outliers' in the top menu to get started!"),
+                          
+                        )
+                      ),
+                      tags$br(), tags$br(), tags$br(), tags$br(), 
+                      
+                      fluidRow(
+                        "The data on this site is a sample from an air quality data set of California metro areas.
                              It has been altered to include randomly generated outliers for educational purposes. See the original data ",
-                            tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", " here."),
-                            tags$br(), tags$br()
-                        ), # end of fourth row
-                        fluidRow(
-                            tags$em("This site was created by Glen Morgenstern and is hosted by the Duke Statistical Science Department.")
-                       ) #end of fifth row
-               ), #end of first tab
-               
+                        tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", " here."),
+                        tags$br(), tags$br()
+                      ), # end of fourth row
+                      fluidRow(
+                        tags$em("This site was created by Glen Morgenstern and updated by Sean Li.")
+                      ) #end of fifth row
+             ), #end of first tab
+    
+    tabPanel("Explore",
+              tabsetPanel(
                tabPanel("Identify Outliers",
                         
                         # Sidebar with checkboxes
@@ -340,42 +342,43 @@ tags$style("
                                     tags$br()
                             )
                         )
-               ), #end of fourth tab
-               tabPanel("Quiz",
-                        fluidRow(
-                            tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
-                                        width = "1000", height = "1500",
-                                        frameBorder="0")
-                        )
-               ), # end of fifth tab
-               tabPanel("Resources",
-                        fluidRow(
-                          h4("Further Resources")
-                          ),
-                          
-                        fluidRow(
-                          "Check out the links below to learn more about outlier detection and how to 
+               ) #end of fourth tab
+               ), #end of tab panel
+               ), # End of explore,
+tabPanel("Resources",
+         fluidRow(
+           h4("Further Resources")
+         ),
+         
+         fluidRow(
+           "Check out the links below to learn more about outlier detection and how to 
                           deal with them."),
-                        tags$br(),
-
-                        fluidRow(
-                          wellPanel(
-                          tags$ul(
-                            tags$li(tags$a(href = "https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/box-whisker-plots/a/identifying-outliers-iqr-rule",
-                                           "Khan Academy - Simple Outlier Identification")),
-                            tags$li(tags$a(href = "https://towardsdatascience.com/5-ways-to-detect-outliers-that-every-data-scientist-should-know-python-code-70a54335a623",
-                                           "Towards Data Science - DBScan, Isolation Forests, Random Cut Forests")),
-                            tags$li(tags$a(href = "http://r-statistics.co/Outlier-Treatment-With-R.html",
-                                           "Advanced Outlier Tutorial in R")),
-                            tags$li(tags$a(href = "https://www.openintro.org/book/os/",
-                                           "Free Open Intro Statistics Textbook")),
-                          )
-                          ),
-                          tags$br()
-                          
-                        ) # End of fluidRow
-                        ) # End of sixth tab
-               ) # End of navBarPage
+         tags$br(),
+         
+         fluidRow(
+           wellPanel(
+             tags$ul(
+               tags$li(tags$a(href = "https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/box-whisker-plots/a/identifying-outliers-iqr-rule",
+                              "Khan Academy - Simple Outlier Identification")),
+               tags$li(tags$a(href = "https://towardsdatascience.com/5-ways-to-detect-outliers-that-every-data-scientist-should-know-python-code-70a54335a623",
+                              "Towards Data Science - DBScan, Isolation Forests, Random Cut Forests")),
+               tags$li(tags$a(href = "http://r-statistics.co/Outlier-Treatment-With-R.html",
+                              "Advanced Outlier Tutorial in R")),
+               tags$li(tags$a(href = "https://www.openintro.org/book/os/",
+                              "Free Open Intro Statistics Textbook")),
+             )
+           ),
+           tags$br()
+           
+         ) # End of fluidRow
+   ),# end of resources
+tabPanel("Quiz",
+         fluidRow(
+           tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
+                       width = "1000", height = "1500",
+                       frameBorder="0")
+         )
+)# end of quiz tab
                ) # End of UI
     
 
