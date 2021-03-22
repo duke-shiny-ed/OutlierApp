@@ -273,8 +273,8 @@ ui <- navbarPage(
                                 tags$br(),
                                 radioButtons("measure",
                                              "Choose your measure:",
-                                             c("Leverage" = "leverage",
-                                               "Standardized residuals" = "standardizedResiduals",
+                                             c("Standardized residuals" = "standardizedResiduals",
+                                               "Leverage" = "leverage",
                                                "Cook's Distance" = "cooksDistance"
                                              ))
                                 ,
