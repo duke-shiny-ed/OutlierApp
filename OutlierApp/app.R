@@ -214,38 +214,42 @@ ui <- navbarPage(
     
     tabPanel("Explore",
               tabsetPanel(
-               tabPanel("Identify Outliers",
+               tabPanel("Fit the Model",
                         
                         # Sidebar with checkboxes
                         sidebarLayout(position = "left",
                             sidebarPanel(
-                                # h4("Identify Outliers"),
-                                # "On the right, you see a simple linear model 
-                                #   relating median household income and value added by businesses. Toggle the 
-                                #   checkboxes below to include or exclude outliers from the model.", 
-                                # tags$i("Outliers are in brown."),
-                                # tags$br(),
-                                # tags$br(),
-                                # checkboxGroupInput("include",
-                                #                    "Include:",
-                                #                    c("Middle Income Outlier",
-                                #                      "High Income Outliers"), 
-                                #                    selected = c("Middle Income Outlier",
-                                #                                 "High Income Outliers")),
-                                # 
-                                # tags$br(),
-                                # tags$b("Exercise: "), "When the high income
-                                # outliers are excluded from the model, 
-                                # what happens to the slope of the regression 
-                                # line?",
-                                # 
-                                # radioButtons("identifyExercise", "",
-                                #              choices = 
-                                #                c("Slope increases" = "slopeIncrease",
-                                #                  "Slope falls" = "slopeFall",
-                                #                  "Slope remains constant"),
-                                #              selected = character(0)),
-                                # span(htmlOutput("identifyExerciseAnswer"), style = "font-weight: bold")
+                                 h4("Fit the Model"),
+                                "The scatterplot shows the relationship between the median household income (Medi) and business value added (BAV) for 27 Californian Metro Areas.",
+                                tags$br(),
+                                 "The original model based on these 27 observations is: ",
+                                 withMathJax("$\\hat{BAV} = -1496.350 + 0.939 \\times Medi$"),
+                                
+                                  tags$br(),
+                                  tags$hr(),
+                                  tags$br(),
+                                
+                                 "Let’s explore how the model, in particular the coefficient of (Medi),  changes if new observations are added to the data set.",  
+                                tags$br(),
+                                 "Click to add points to the scatterplot. As you add points, the model will be refit using the a data set that includes the original data and the newly added points.", 
+                                tags$br(),
+                                tags$br(),
+                                "Notice how the model changes as new points are added to the data set. ",
+                                tags$ul(
+                                 tags$li("How does intercept change?"), 
+                                 tags$li(" How does the estimated coefficient of (Medi) change?"),
+                                 tags$li(" How does the confidence interval for the coefficient of (Medi) change?")
+                                ),
+                                tags$br(),
+                                tags$hr(),
+                                tags$br(),
+                                "Try adding the following points to the data and see how the model changes:",
+                                tags$ul(
+                                  tags$li("Point that is an outlier in (Medi) but not in (BAV)"), 
+                                  tags$li("Point that is an outlier in (BAV) but not in (Medi)"),
+                                  tags$li("An influential point")
+                                )
+                                 
                             ),
                             
                             
