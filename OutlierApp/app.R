@@ -256,9 +256,9 @@ ui <- navbarPage(
                             # Show a plot of the generated model
                             mainPanel(
                                 plotOutput("outlierGraph", click = "plot_click"),
-                                tags$li("Original Model"),
+                                "Model using original observations",
                                 verbatimTextOutput("staticModel"),
-                                tags$li("User Augmented Model"),
+                                "Model using original AND new observations",
                                 verbatimTextOutput("outlierModel"),
                                 verbatimTextOutput("clickInfo"),
                                 actionButton("reset", label = "Reset to Original"),
@@ -417,8 +417,8 @@ server <- function(input, output) {
         #if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
             static <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
-                     x = "Median Household Income", y = "Business Value Added") + 
-              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray")  
+                     x = "Median Household Income (Medi)", y = "Business Value Added (BVA)") + 
+              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray") + theme_bw() 
         #this next line adds the new values on
             initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
              replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=vala), color = "red") +
