@@ -267,10 +267,10 @@ ui <- navbarPage(
                         ) 
                ), #end of second tab
                
-               tabPanel("Measure Outliers",
+               tabPanel("Model Diagnostics",
                         sidebarLayout(
                             sidebarPanel(
-                                h4("Measure Outliers"),
+                                h4("Model Diagnostics"),
                                 "Toggle the radio buttons to learn how to calculate 
                                   measures for outliers and what they mean.",
                                 tags$br(),
@@ -417,7 +417,7 @@ server <- function(input, output) {
         #if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
             static <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
-                     x = "Median Household Income (Medi)", y = "Business Value Added (BVA)") + 
+                     x = "Median Household Income (Medi)", y = "Business Value Added (BAV)") + 
               geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray") + theme_bw() 
         #this next line adds the new values on
             initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
@@ -649,7 +649,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                      y = "Leverage") + 
                 geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),"")),
                           position = position_nudge(y=0.005)) + 
-                scale_color_brewer(palette = "Dark2") + 
+                scale_color_brewer(palette = "Dark2") + theme_bw() +
               annotate("text", x = 15, y = 0.2302, label = "Outliers ABOVE red line")+
               annotate("text", x=23, y = 0.13, label = "added points RIGHT of line")
         }
@@ -663,7 +663,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                      y = "Standard Residuals") + 
                 geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ", as.character(obs_num)),"")),
                           position = position_nudge(y=0.2)) + 
-                scale_color_brewer(palette = "Dark2") + 
+                scale_color_brewer(palette = "Dark2") + theme_bw() +
               annotate("text", x = 1000, y = c(2.2, -2.2), label = c("Outliers ABOVE this line", "Outliers BELOW this line"))
         }
         else if(input$measure == "cooksDistance"){
@@ -674,7 +674,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 labs(x = "Observation Number", y = "Cook's Distance", title = "Cook's Distance") + 
                 geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),"")),
                           position = position_nudge(y=0.1)) + 
-                scale_color_brewer(palette = "Dark2") + 
+                scale_color_brewer(palette = "Dark2") + theme_bw() +
               annotate("text", x = 15, y = 1.05, label = "Outliers ABOVE red line")+
               annotate("text", x=23, y = 1.5, label = "added points RIGHT of line")
         }
