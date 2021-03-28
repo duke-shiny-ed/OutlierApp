@@ -220,10 +220,10 @@ ui <- navbarPage(
                         sidebarLayout(position = "left",
                             sidebarPanel(
                                  h4("Fit the Model"),
-                                "The scatterplot shows the relationship between the median household income (Medi) and business value added (BAV) for 27 Californian Metro Areas.",
+                                "The scatterplot shows the relationship between the median household income (Medi) and business value added (BVA) for 27 Californian Metro Areas.",
                                 tags$br(),
                                  "The original model based on these 27 observations is: ",
-                                 withMathJax("$\\hat{BAV} = -1496.350 + 0.939 \\times Medi$"),
+                                 withMathJax("$\\hat{BVA} = -1496.350 + 0.939 \\times Medi$"),
                                 
                                   tags$br(),
                                   tags$hr(),
@@ -245,8 +245,8 @@ ui <- navbarPage(
                                 tags$br(),
                                 "Try adding the following points to the data and see how the model changes:",
                                 tags$ul(
-                                  tags$li("Point that is an outlier in (Medi) but not in (BAV)"), 
-                                  tags$li("Point that is an outlier in (BAV) but not in (Medi)"),
+                                  tags$li("Point that is an outlier in (Medi) but not in (BVA)"), 
+                                  tags$li("Point that is an outlier in (BVA) but not in (Medi)"),
                                   tags$li("An influential point")
                                 )
                                  
@@ -257,9 +257,11 @@ ui <- navbarPage(
                             mainPanel(
                                 plotOutput("outlierGraph", click = "plot_click"),
                                 "Model using original observations",
-                                verbatimTextOutput("staticModel"),
+                                htmlOutput("staticModel"),
+                                tags$br(),
+                                tags$br(),
                                 "Model using original AND new observations",
-                                verbatimTextOutput("outlierModel"),
+                                htmlOutput("outlierModel"),
                                 verbatimTextOutput("clickInfo"),
                                 actionButton("reset", label = "Reset to Original"),
                                 tags$br()
@@ -287,25 +289,33 @@ ui <- navbarPage(
                                 uiOutput("measureFormula"),
                                     tags$br(),
                                     tags$br(),
+                                    tags$hr(),
+                               tags$b("Common Thresholds for Outliers"),
+                               tags$br(),
+                               "An observation can be considered an outlier if this conditions is satisfied:",
+                               tags$br(),
+                               tags$br(),
+                                htmlOutput("thresMeasure"),
+                                    tags$hr(),
                                     tags$b("Goal: "), "Learn three methods to identify 
                                               outliers in a data set."
                             ),
                             mainPanel(
                                 plotOutput("measureGraph"),
                                 wellPanel(
-                                tags$b("Common Thresholds for Outliers"),
-                                tags$br(),
-                                "An observation can be considered an outlier if at least one of these conditions is satisfied:",
-                                tags$br(),
-                                tags$br(),
-                                tags$b("1. "), withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of predictor variables + 1 and (n) is number of observations, OR"),
-                                tags$br(),
-                                tags$b("2. "), "|Std. Resid.| > 2, OR",
-                                tags$br(),
-                                tags$b("3. "), "Cook's Distance > 1",
-                                tags$br(),
-                                tags$br(),
-                                tags$b("Exercise: "), "Which observations are outliers? Labeled points are the answers.",
+                                # tags$b("Common Thresholds for Outliers"),
+                                # tags$br(),
+                                # "An observation can be considered an outlier if at least one of these conditions is satisfied:",
+                                # tags$br(),
+                                # tags$br(),
+                                # tags$b("1. "), withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of predictor variables + 1 and (n) is number of observations, OR"),
+                                # tags$br(),
+                                # tags$b("2. "), "|Std. Resid.| > 2, OR",
+                                # tags$br(),
+                                # tags$b("3. "), "Cook's Distance > 1",
+                                # tags$br(),
+                                # tags$br(),
+                                # tags$b("Exercise: "), "Which observations are outliers? Labeled points are the answers.",
                                # checkboxInput('answerVisible', tags$i('Show true outliers'), FALSE),
                                # uiOutput('outlierAnswers')
                                 ),
@@ -319,6 +329,9 @@ ui <- navbarPage(
                             sidebarPanel(
                                 h4("Deal with Outliers"),
                                 "What should you do with your outliers? See whether the actions below are appropriate.",
+                                tags$br(),
+                                tags$br(),
+                                "*this data set is not the one used in previous tabs with added points",
                                 tags$br(),
                                 tags$br(),
                                 checkboxGroupInput("solution",
@@ -375,14 +388,14 @@ tabPanel("Resources",
            tags$br()
            
          ) # End of fluidRow
-   ),# end of resources
-tabPanel("Quiz",
-         fluidRow(
-           tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
-                       width = "1000", height = "1500",
-                       frameBorder="0")
-         )
-)# end of quiz tab
+   )# end of resources
+# tabPanel("Quiz",
+#          fluidRow(
+#            tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
+#                        width = "1000", height = "1500",
+#                        frameBorder="0")
+#          )
+# )# end of quiz tab
                ) # End of UI
     
 
@@ -417,8 +430,8 @@ server <- function(input, output) {
         #if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
             static <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
-                     x = "Median Household Income (Medi)", y = "Business Value Added (BAV)") + 
-              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray") + theme_bw() 
+                     x = "Median Household Income (Medi)", y = "Business Value Added (BVA)") + 
+              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray") + theme_bw() + theme(text = element_text(size=20))
         #this next line adds the new values on
             initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
              replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=vala), color = "red") +
@@ -515,7 +528,7 @@ server <- function(input, output) {
     
     tab2Model %>%
         tidy(conf.int = TRUE) %>%
-        kable(format = "markdown", digits = 3)
+        kable(format = "html", digits = 3)
    
      })
     output$staticModel <- renderPrint({
@@ -523,7 +536,7 @@ server <- function(input, output) {
       
       tab2Modelstatic %>%
         tidy(conf.int = TRUE) %>%
-        kable(format = "markdown", digits = 3)
+        kable(format = "html", digits = 3)
       
     })
     #End of outlierModel code
@@ -562,6 +575,7 @@ output$measureText <- renderText({
 output$measureDefinition <- renderText({
     definition = ""
     vocabWord = ""
+   
     if(input$measure == "leverage") {
         vocabWord<-"Leverage "
         definition = "is the measure of the distance between 
@@ -584,8 +598,27 @@ output$measureDefinition <- renderText({
         the estimated coefficients. Formula below: \n \n"
     }
     paste0("<font-weight:bold><b>", vocabWord, "</b></font>", definition)
+   
 })
-
+output$thresMeasure <- renderText({
+  thres = ""
+  headert = ""
+  
+  
+  if(input$measure == "leverage") {
+    thres = withMathJax("Leverage > $\\large \\frac{2(p+1)}{n}$, where (p)=num. of predictor variables + 1 and (n) is number of observations\n")
+  }
+  
+  else if(input$measure == "standardizedResiduals") {
+    thres = "|Std. Resid.| > 2\n"
+  }
+  
+  else {
+    thres = "Cook's Distance > 1\n"
+  }
+  paste0("<font-weight:bold><b>", headert, "</b></font>", thres)
+  
+})
 #Code for outlierAnswers below
 # output$outlierAnswers <- renderUI({
 #     if (!input$answerVisible) return()
