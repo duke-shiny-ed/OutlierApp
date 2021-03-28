@@ -9,6 +9,8 @@ library(learnr)
 library(shinythemes)
 library(bslib)
 library(shinyBS)
+library(DT
+        )
 
 initial <- read_csv("data/airq-no-outliers.csv")
 initial$outlier <- c(rep("no", 23))
@@ -318,6 +320,9 @@ ui <- navbarPage(
                                 # tags$b("Exercise: "), "Which observations are outliers? Labeled points are the answers.",
                                # checkboxInput('answerVisible', tags$i('Show true outliers'), FALSE),
                                # uiOutput('outlierAnswers')
+                                  tags$b("Table of User Added Observations:"),
+                                  tags$br(),
+                                  DTOutput(outputId = "dynamicTable")
                                 ),
                                 tags$br()
                         )
@@ -331,7 +336,7 @@ ui <- navbarPage(
                                 "What should you do with your outliers? See whether the actions below are appropriate.",
                                 tags$br(),
                                 tags$br(),
-                                "*this data set is not the one used in previous tabs with added points",
+                                "**this data set is not the one used in previous tabs with added points**",
                                 tags$br(),
                                 tags$br(),
                                 checkboxGroupInput("solution",
@@ -619,6 +624,11 @@ output$thresMeasure <- renderText({
   paste0("<font-weight:bold><b>", headert, "</b></font>", thres)
   
 })
+
+output$dynamicTable <- renderDT(
+  datatable(values$DT)
+)
+
 #Code for outlierAnswers below
 # output$outlierAnswers <- renderUI({
 #     if (!input$answerVisible) return()
