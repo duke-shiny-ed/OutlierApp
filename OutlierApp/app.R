@@ -12,7 +12,8 @@ library(shinyBS)
 library(DT
         )
 
-initial <- read_csv("data/airq-no-outliers.csv")
+initial <- read_csv("data/airq-no-outliers.csv") %>%
+  rename(bva = vala)
 initial$outlier <- c(rep("no", 23))
 
 
@@ -25,20 +26,20 @@ randY2 <- runif(1, min = 13000, max = 16000)
 randY3 <- runif(1, min = 13000, max = 16500)
 randY4 <- runif(1, min = 400, max = 1500)
 
-# Flip coin to see if middle income outlier has unusually high or low vala
+# Flip coin to see if middle income outlier has unusually high or low bva
 determiner <- runif(1, min = 0, max = 1)
 ifelse (determiner<0.5, randY1 <- runif(1, min = 25, max = 75),
                                         randY1 <- runif(1, min = 10000, max = 11000))
 
-df1 = data.frame(X = c(31:34), airq = c(rep(1, 4)), vala = c(randY1, randY2, randY3, randY4), 
+df1 = data.frame(X = c(31:34), airq = c(rep(1, 4)), bva = c(randY1, randY2, randY3, randY4), 
                  rain = c(rep(1, 4)), coas = c(rep("yes", 4)), dens = c(rep(1, 4)),
                  medi = c(randX1, randX2, randX3, randX4), outlier = rep("yes", 4)) # Create data frame from random outliers
 
-df2 = data.frame(X = 31, airq = 1, vala = randY1, 
+df2 = data.frame(X = 31, airq = 1, bva = randY1, 
                  rain = 1, coas = "yes", dens = 1, 
                  medi = randX1, outlier = "yes") # Create data frame for noHighTab2
 
-df3 = data.frame(X = c(32:34), airq = c(rep(1, 3)), vala = c(randY2, randY3, randY4), 
+df3 = data.frame(X = c(32:34), airq = c(rep(1, 3)), bva = c(randY2, randY3, randY4), 
                  rain = c(rep(1, 3)), coas = c(rep("yes", 3)), dens = c(rep(1, 3)), 
                  medi = c(randX2, randX3, randX4), outlier = rep("yes", 3)) # Create data frame for noMedTab2
 
@@ -74,7 +75,7 @@ randY8 <- runif(5, min = 100, max = 15000)
 largeSampleX <- c(randX5, randX6, randX7, randX8)
 largeSampleY <- c(randY5, randY6, randY7, randY8)
 
-df4 = data.frame(X = c(35:53), airq = c(rep(1, 19)), vala = largeSampleY, 
+df4 = data.frame(X = c(35:53), airq = c(rep(1, 19)), bva = largeSampleY, 
                  rain = c(rep(1, 19)), coas = c(rep("yes", 19)), dens = c(rep(1, 19)), 
                  medi = largeSampleX, outlier = rep("no", 19)) # Create data frame for largeSample
 
@@ -84,7 +85,7 @@ largeSampleNoHigh <- rbind(noHighTab2, df4)
 largeSampleNoOutliers <- rbind(initial, df4)
 
 # Create augmented data frame with predictions
-initialModel <- lm(vala ~ medi, data = initialTab2)
+initialModel <- lm(bva ~ medi, data = initialTab2)
 
 initial_aug <- augment(initialModel) %>%
     mutate(obs_num = row_number())
@@ -126,26 +127,14 @@ bs_theme_fonts(
   heading = "'Arial', sans-serif"
 )
 
+## About Panel -----------------------------------------------------------------
+
 # Define UI for application
 ui <- navbarPage(
   theme = shinytheme("lumen"),
   title = "Outliers",
-  ##includeCSS("styles.css"),
-# Edit style for checkboxes and radio buttons
-# tags$style("
-#       input[type='checkbox']{ /* style for checkboxes */
-#         width: 10px; /*Desired width*/
-#         height: 10px; /*Desired height*/
-#         line-height: 8px; 
-#       }
-#       span { 
-#           margin-left: 5px;  /*set the margin, so boxes don't overlap labels*/
-#           line-height: 20px; 
-#       }
-#   "),
-
-    #bootstraplib::bootstrap(),
             tabPanel("About",
+                     style = "font-size:20px",
                      withMathJax(),
                      tags$script("MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
     processEscapes: true}});"),
@@ -201,39 +190,43 @@ ui <- navbarPage(
                           
                         )
                       ),
-                      tags$br(), tags$br(), tags$br(), tags$br(), 
+                     br(),
                       
                       fluidRow(
-                        "The data on this site is a sample from an air quality data set of California metro areas.
-                             It has been altered to include randomly generated outliers for educational purposes. See the original data ",
-                        tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", " here."),
-                        tags$br(), tags$br()
-                      ), # end of fourth row
+                        column(width = 12,
+                        p("The data on this site is a sample from an air quality data set of California metro areas.
+                             It has been altered to include randomly generated outliers for educational purposes. See the original data",
+                        tags$a(href="https://vincentarelbundock.github.io/Rdatasets/csv/Ecdat/Airq.csv", " here.")),
+                      )), # end of fourth row
+                    br(), hr(),
                       fluidRow(
-                        tags$em("This site was created by Glen Morgenstern and updated by Sean Li.")
-                      ) #end of fifth row
-             ), #end of first tab
-    
+                        column(width = 12, 
+                        h2("Acknowledgements"),
+                        p("This app was originally developed by Glen Morgenstern and updated by Sean Li.")
+                      )),#end of fifth row
+                      ),
+              #end of first tab
+  ## Explore tab----------------------------------------------------------------
+
     tabPanel("Explore",
+             style = "font-size:20px",
               tabsetPanel(
                tabPanel("Fit the Model",
-                        
+              
                         # Sidebar with checkboxes
                         sidebarLayout(position = "left",
                             sidebarPanel(
-                                 h4("Fit the Model"),
+                             #    h4("Fit the Model"),
                                 "The scatterplot shows the relationship between the median household income (Medi) and business value added (BVA) for 27 Californian Metro Areas.",
                                 tags$br(),
                                  "The original model based on these 27 observations is: ",
                                  withMathJax("$\\hat{BVA} = -1496.350 + 0.939 \\times Medi$"),
                                 
-                                  tags$br(),
-                                  tags$hr(),
-                                  tags$br(),
+                                tags$hr(),
                                 
-                                 "Let’s explore how the model, in particular the coefficient of (Medi),  changes if new observations are added to the data set.",  
-                                tags$br(),
-                                 "Click to add points to the scatterplot. As you add points, the model will be refit using the a data set that includes the original data and the newly added points.", 
+                             #    "Let’s explore how the model, in particular the coefficient of (Medi),  changes if new observations are added to the data set.",  
+                                 br(), 
+                                 tags$b("Click to add points to the scatterplot. As you add points, the model will be refit using the a data set that includes the original data and the newly added points."), 
                                 tags$br(),
                                 tags$br(),
                                 "Notice how the model changes as new points are added to the data set. ",
@@ -242,7 +235,7 @@ ui <- navbarPage(
                                  tags$li(" How does the estimated coefficient of (Medi) change?"),
                                  tags$li(" How does the confidence interval for the coefficient of (Medi) change?")
                                 ),
-                                tags$br(),
+          
                                 tags$hr(),
                                 tags$br(),
                                 "Try adding the following points to the data and see how the model changes:",
@@ -257,6 +250,13 @@ ui <- navbarPage(
                             
                             # Show a plot of the generated model
                             mainPanel(
+                              fluidRow(
+                                column(width = 12, 
+                                       br(),
+                                       p(tags$b("Click to add points to the scatterplot. As you add points, the model will be refit using the a data set that includes the original data and the newly added points."), style = "color: red"), 
+                                )
+                              ),
+                              br(), 
                                 plotOutput("outlierGraph", click = "plot_click"),
                                 "Model using original observations",
                                 htmlOutput("staticModel"),
@@ -368,9 +368,11 @@ ui <- navbarPage(
                ), #end of tab panel
                ), # End of explore,
 tabPanel("Resources",
-         fluidRow(
-           h4("Further Resources")
-         ),
+         column(width = 12,
+         style = "font-size:20px",
+         # fluidRow(
+         #   h4("Further Resources")
+         # ),
          
          fluidRow(
            "Check out the links below to learn more about outlier detection and how to 
@@ -392,7 +394,7 @@ tabPanel("Resources",
            ),
            tags$br()
            
-         ) # End of fluidRow
+         )) # End of fluidRow
    )# end of resources
 # tabPanel("Quiz",
 #          fluidRow(
@@ -413,7 +415,7 @@ server <- function(input, output) {
     #     relating median household income and value added by businesses. Toggle the 
     #     checkboxes below to include or exclude outliers from the model."})
     
-    # g <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
+    # g <- ggplot(data=initialTab2, aes(x=medi, y=bva)) + geom_point() + 
     #     labs(title = "Business Value Added vs. Median Income",
     #          x = "Median Household Income", y = "Business Value Added") + 
     #     geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
@@ -425,7 +427,7 @@ server <- function(input, output) {
     
     values <- reactiveValues()
     values$DT <- data.frame(medi = numeric(),
-                            vala = numeric()
+                            bva = numeric()
                             )
     
     
@@ -433,14 +435,14 @@ server <- function(input, output) {
     # Start of outlierGraph code
     output$outlierGraph <- renderPlot({
         #if(is.null(input$include)) { # When no checkboxes checked, change data frame to initialTab2
-            static <- ggplot(data=initialTab2, aes(x=medi, y=vala)) + geom_point() + 
+            static <- ggplot(data=initialTab2, aes(x=medi, y=bva)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income (Medi)", y = "Business Value Added (BVA)") + 
-              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "gray") + theme_bw() + theme(text = element_text(size=20))
+              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=bva), colour = "gray") + theme_bw() + theme(text = element_text(size=20))
         #this next line adds the new values on
             initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
-             replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=vala), color = "red") +
-                geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=vala), colour = "black") + 
+             replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=bva), color = "red") +
+                geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=bva), colour = "black") + 
                 xlim(0, 15000) + ylim(0, 25000) + 
                 scale_color_brewer(palette = "Dark2")
             replot
@@ -448,7 +450,7 @@ server <- function(input, output) {
         # if(length(input$include) == 1) { # When one checkbox checked
         #     
         #     if (input$include == "Middle Income Outlier") { # When only include Middle Income Outlier checked
-        #         g <- ggplot(data=noHighTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        #         g <- ggplot(data=noHighTab2, aes(x=medi, y=bva, color = outlier)) + geom_point() + 
         #             labs(title = "Business Value Added vs. Median Income",
         #                  x = "Median Household Income", y = "Business Value Added") + 
         #             geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
@@ -456,7 +458,7 @@ server <- function(input, output) {
         #             scale_color_brewer(palette = "Dark2")
         #     }
         #     if(input$include == "High Income Outliers") { #When only include High Income Outliers is checked
-        #         g <- ggplot(data=noMedTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        #         g <- ggplot(data=noMedTab2, aes(x=medi, y=bva, color = outlier)) + geom_point() + 
         #             labs(title = "Business Value Added vs. Median Income",
         #                  x = "Median Household Income", y = "Business Value Added")+ 
         #             geom_smooth(method = "lm", se = FALSE, aes(group=1), colour = "black") + 
@@ -465,7 +467,7 @@ server <- function(input, output) {
         #     }
         # }
         # else if (length(input$include == 2)){ # When both checkboxes are checked, use initialTab2 dataframe
-        #     g <- ggplot(data=initialTab2, aes(x=medi, y=vala, color = outlier)) + geom_point() + 
+        #     g <- ggplot(data=initialTab2, aes(x=medi, y=bva, color = outlier)) + geom_point() + 
         #         labs(title = "Business Value Added vs. Median Income",
         #              x = "Median Household Income", y = "Business Value Added") + 
         #         geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
@@ -485,7 +487,7 @@ server <- function(input, output) {
     observeEvent(input$plot_click, {
       # each input is a factor so levels are consistent for plotting characteristics
       add_row <- data.frame(medi = input$plot_click$x,
-                            vala = input$plot_click$y
+                            bva = input$plot_click$y
                            )
       # add row to the data.frame
       values$DT <- rbind(values$DT, add_row)
@@ -511,38 +513,41 @@ server <- function(input, output) {
     }
     
     #Start of outlierModel code
-    output$outlierModel <- renderPrint({
+    output$outlierModel <- renderText({
     initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
-    tab2Model <- lm(vala ~ medi, data = initialTab2) #model statistics on the bottom
+    tab2Model <- lm(bva ~ medi, data = initialTab2) #model statistics on the bottom
     
     # if(is.null(input$include)) {
-    #     tab2Model <- lm(vala ~ medi, data = initial)
+    #     tab2Model <- lm(bva ~ medi, data = initial)
     # }
     # else if(length(input$include) == 1) {
     #     if (input$include == "Middle Income Outlier") {
-    #         tab2Model <- lm(vala ~ medi, data = noHighTab2)
+    #         tab2Model <- lm(bva ~ medi, data = noHighTab2)
     #     }
     #     else if(input$include == "High Income Outliers") {
-    #         tab2Model <- lm(vala ~ medi, data = noMedTab2)
+    #         tab2Model <- lm(bva ~ medi, data = noMedTab2)
     #     }
     # }
     # else if (length(input$include == 2)){
-    #     tab2Model <- lm(vala ~ medi, data = initialTab2)
+    #     tab2Model <- lm(bva ~ medi, data = initialTab2)
     #     
     # }
     
     tab2Model %>%
         tidy(conf.int = TRUE) %>%
-        kable(format = "html", digits = 3)
+        kable(format = "html", digits = 3) %>%
+        kableExtra::kable_styling("striped", full_width = F, font_size = 15)
+    
+ 
    
      })
-    output$staticModel <- renderPrint({
-      tab2Modelstatic <- lm(vala ~ medi, data = initialTab2) #model statistics on the bottom
+    output$staticModel <- renderText({
+      tab2Modelstatic <- lm(bva ~ medi, data = initialTab2) #model statistics on the bottom
       
       tab2Modelstatic %>%
         tidy(conf.int = TRUE) %>%
-        kable(format = "html", digits = 3)
-      
+        kable(format = "html", digits = 3) %>%
+        kableExtra::kable_styling("striped", full_width = F, font_size = 15)
     })
     #End of outlierModel code
     
@@ -669,7 +674,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
 
     output$measureGraph <- renderPlot({
       initialTab2 <- rbind.match.columns(initialTab2,values$DT)
-      initialModel <- lm(vala ~ medi, data = initialTab2)
+      initialModel <- lm(bva ~ medi, data = initialTab2)
 
       initial_aug <- augment(initialModel) %>%
         mutate(obs_num = row_number())
@@ -730,7 +735,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     
     # Code for originalGraph
     # output$originalGraph <- renderPlot({
-    #     ggplot(data=initialTab2, aes(x=medi, y=vala, color=outlier)) + geom_point() + 
+    #     ggplot(data=initialTab2, aes(x=medi, y=bva, color=outlier)) + geom_point() + 
     #         labs(title = "(Unchanged) Value Added vs. Median Income",
     #              x = "Median Household Income", y = "Business Value Added") + 
     #         geom_smooth(method = "lm", se = FALSE, aes(group = 1), colour = "black") + 
@@ -742,7 +747,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         
         solnGraph = ggplot()
         if (is.null(input$solution)) {
-            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "(Unchanged) Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -755,7 +760,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         logTrans <- "Log transform y values" %in% input$solution
         
         if(med4 & high4 & sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -763,7 +768,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }
         else if (med4 & high4 & sample4){
-            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -771,7 +776,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & high4 & logTrans){
-            solnGraph <- ggplot(data = initial, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = initial, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -779,7 +784,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & sample4 & logTrans){
-            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -787,7 +792,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (high4 & sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -795,7 +800,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }  
         else if (med4 & high4){
-            solnGraph <- ggplot(data = initial, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = initial, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -803,7 +808,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & logTrans){
-            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -811,7 +816,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (med4 & sample4){
-            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -819,7 +824,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         } 
         else if (high4 & sample4) {
-            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -827,7 +832,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }  
         else if(high4 & logTrans) {
-            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -835,7 +840,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }
         else if(sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -843,7 +848,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }
         else if(med4) {
-            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -851,7 +856,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }
         else if(high4) {
-            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -859,7 +864,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }
         else if(sample4) {
-            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = vala, color = outlier)) + 
+            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = bva, color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
@@ -867,7 +872,7 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 scale_color_brewer(palette = "Dark2")
         }
         else if(logTrans) {
-            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(vala), color = outlier)) + 
+            solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(bva), color = outlier)) + 
                 geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
@@ -1025,10 +1030,10 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     
     # Code for solutionsR2
     output$solutionsR2 <- renderPrint({
-    solnModel <- lm(vala ~ medi, data = initialTab2) # default
+    solnModel <- lm(bva ~ medi, data = initialTab2) # default
     
     if (is.null(input$solution)) {
-        solnModel <- lm(vala ~ medi, data = initialTab2) # default
+        solnModel <- lm(bva ~ medi, data = initialTab2) # default
     }
     
     med4     <- "Remove middle income outlier" %in% input$solution
@@ -1037,49 +1042,49 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
     logTrans <- "Log transform y values" %in% input$solution
     
     if(med4 & high4 & sample4 & logTrans) {
-        solnModel <- lm(log(vala) ~ medi, data = largeSampleNoOutliers)
+        solnModel <- lm(log(bva) ~ medi, data = largeSampleNoOutliers)
     }
     else if (med4 & high4 & sample4){
-        solnModel <- lm(vala ~ medi, data = largeSampleNoOutliers)
+        solnModel <- lm(bva ~ medi, data = largeSampleNoOutliers)
     } 
     else if (med4 & high4 & logTrans){
-        solnModel <- lm(log(vala) ~ medi, data = initial)
+        solnModel <- lm(log(bva) ~ medi, data = initial)
     } 
     else if (med4 & sample4 & logTrans){
-        solnModel <- lm(log(vala) ~ medi, data = noMedTab2)
+        solnModel <- lm(log(bva) ~ medi, data = noMedTab2)
     } 
     else if (high4 & sample4 & logTrans) {
-        solnModel <- lm(log(vala) ~ medi, data = noHighTab2)
+        solnModel <- lm(log(bva) ~ medi, data = noHighTab2)
     }  
     else if (med4 & high4){
-        solnModel <- lm(vala ~ medi, data = initial)
+        solnModel <- lm(bva ~ medi, data = initial)
     } 
     else if (med4 & logTrans){
-        solnModel <- lm(log(vala) ~ medi, data = noMedTab2)
+        solnModel <- lm(log(bva) ~ medi, data = noMedTab2)
     } 
     else if (med4 & sample4){
-        solnModel <- lm(vala ~ medi, data = largeSampleNoMed)
+        solnModel <- lm(bva ~ medi, data = largeSampleNoMed)
     } 
     else if (high4 & sample4) {
-        solnModel <- lm(vala ~ medi, data = largeSampleNoHigh)
+        solnModel <- lm(bva ~ medi, data = largeSampleNoHigh)
     }  
     else if(high4 & logTrans) {
-        solnModel <- lm(log(vala) ~ medi, data = noHighTab2)
+        solnModel <- lm(log(bva) ~ medi, data = noHighTab2)
     }
     else if(sample4 & logTrans) {
-        solnModel <- lm(log(vala) ~ medi, data = largeSample)
+        solnModel <- lm(log(bva) ~ medi, data = largeSample)
     }
     else if(med4) {
-        solnModel <- lm(vala ~ medi, data = noMedTab2)
+        solnModel <- lm(bva ~ medi, data = noMedTab2)
     }
     else if(high4) {
-        solnModel <- lm(vala ~ medi, data = noHighTab2)
+        solnModel <- lm(bva ~ medi, data = noHighTab2)
     }
     else if(sample4) {
-        solnModel <- lm(vala ~ medi, data = largeSample)
+        solnModel <- lm(bva ~ medi, data = largeSample)
     }
     else if(logTrans) {
-        solnModel <- lm(log(vala) ~ medi, data = initialTab2)
+        solnModel <- lm(log(bva) ~ medi, data = initialTab2)
     }
     
         summary(solnModel)$r.squared
