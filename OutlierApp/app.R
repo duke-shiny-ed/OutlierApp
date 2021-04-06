@@ -367,6 +367,9 @@ ui <- navbarPage(
                ) #end of fourth tab
                ), #end of tab panel
                ), # End of explore,
+
+## Resources -------------------------------------------------------------------
+
 tabPanel("Resources",
          column(width = 12,
          style = "font-size:20px",
@@ -396,6 +399,21 @@ tabPanel("Resources",
            
          )) # End of fluidRow
    )# end of resources
+
+## Feedback --------------------------------------------------------------------
+tabPanel("Feedback",
+         style = "font-size: 20px",
+         
+         p("Use the form below to submit feedback about the app."), 
+         br(), br(),
+         
+         tags$iframe(src = "https://forms.office.com/Pages/ResponsePage.aspx?id=TsVyyzFKnk2xSh6jbfrJTBw0r2_bKCVMs9lST1_-2sxURDBLWjhPVzlUUTE4UVlUR1pVNzlZT0NZVi4u",
+                     width = "900", height = "400",
+                     frameBorder="0")
+)
+
+
+)
 # tabPanel("Quiz",
 #          fluidRow(
 #            tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
