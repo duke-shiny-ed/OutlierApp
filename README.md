@@ -1,5 +1,5 @@
 # OutlierApp
-Title: How to Identify and Deal with Outliers
+Title: How to Identify and Deal with Outliers '\n'
 Author: Glen Morgenstern & Sean Li
 Learning Objectives:
 - Learn at least one way to identify an outlier
