@@ -9,8 +9,7 @@ library(learnr)
 library(shinythemes)
 library(bslib)
 library(shinyBS)
-library(DT
-        )
+library(DT)
 
 initial <- read_csv("data/airq-no-outliers.csv") %>%
   rename(bva = vala)
@@ -132,7 +131,8 @@ bs_theme_fonts(
 # Define UI for application
 ui <- navbarPage(
   theme = shinytheme("lumen"),
-  title = "Outliers",
+ # theme = bs_theme(version = 4, bootswatch = "flatly"),
+  title = "Model diagnostics",
             tabPanel("About",
                      style = "font-size:20px",
                      withMathJax(),
@@ -146,20 +146,18 @@ ui <- navbarPage(
                       wellPanel(
                         fluidRow(
                           column(9, offset = 0.1,
-                                 "Outliers can be tricky to pin down. Once you've figured out where 
-                            your outliers are, it's hard to know what do with them. In this app, 
-                            you will learn methods for recognizing and treating outliers in your 
-                            data. These include:",
-                                 style='border-right: 1px solid red'
+                                 "Welcome! This app will help you explore model diagnostics and how influential points can impact model coefficients."
+                                # style='border-right: 1px solid red'
                           ),
-                          column(3,
-                                 tags$i("Note: Google Chrome ", tags$b("strongly"), 
-                                        " recommended for best user experience."))),
+                        #  column(3,
+                           #      tags$i("Note: Google Chrome ", tags$b("strongly"), 
+                                       # " recommended for best user experience.")
+                        ),
                         tags$br(),
                         fluidRow(
                           column(5,
-                                 h5(
-                                   tags$b("Identifying Outliers")),
+                                 h3(
+                                   tags$b("Model diagnostics explored"), style = 'color: #0577B1'),
                                  tags$br(),
                                  tags$ul(
                                    tags$li("Leverage"),
@@ -170,8 +168,8 @@ ui <- navbarPage(
                                  tags$br()
                           ),
                           column(5,
-                                 h5(
-                                   tags$b("Dealing with Outliers")),
+                                 h3(
+                                   tags$b("Approaches explored"), style = 'color: #0577B1'),
                                  tags$br(),
                                  tags$ul(
                                    tags$li("Transforming the data"),
@@ -181,15 +179,16 @@ ui <- navbarPage(
                                  tags$br(),
                                  tags$br()
                           ), 
-                          column(2,
-                                 img(src = "DukeShinyEdLogo.png", height = 140, width = 117))
+                         # column(2,
+                         #        img(src = "DukeShinyEdLogo.png", height = 140, width = 117))
                         ), #end of second row
                         fluidRow(
                           column(10, offset = 0.1,
-                                 "Click on 'Identify Outliers' in the top menu to get started!"),
+                                 "Click Explore in the top menu to get started! 
+                                 Note: Google Chrome is strongly recommended for best user experience")),
                           
                         )
-                      ),
+                      ,
                      br(),
                       
                       fluidRow(
@@ -217,18 +216,11 @@ ui <- navbarPage(
                         sidebarLayout(position = "left",
                             sidebarPanel(
                              #    h4("Fit the Model"),
-                                "The scatterplot shows the relationship between the median household income (Medi) and business value added (BVA) for 27 Californian Metro Areas.",
-                                tags$br(),
-                                 "The original model based on these 27 observations is: ",
-                                 withMathJax("$\\hat{BVA} = -1496.350 + 0.939 \\times Medi$"),
-                                
+                #              p("The scatterplot shows the relationship between the median household income (Medi) and business value added (BVA) for 27 Californian Metro Areas."),
+                              tags$b("Click on the scatterplot to to add new points. As you add points, the model will be refit using the a data set that includes the original data and the newly added points.", style = 'color: red'), 
+                              br(),
                                 tags$hr(),
-                                
-                             #    "Let’s explore how the model, in particular the coefficient of (Medi),  changes if new observations are added to the data set.",  
-                                 br(), 
-                                 tags$b("Click to add points to the scatterplot. As you add points, the model will be refit using the a data set that includes the original data and the newly added points."), 
-                                tags$br(),
-                                tags$br(),
+                              br(), 
                                 "Notice how the model changes as new points are added to the data set. ",
                                 tags$ul(
                                  tags$li("How does intercept change?"), 
@@ -237,35 +229,33 @@ ui <- navbarPage(
                                 ),
           
                                 tags$hr(),
-                                tags$br(),
-                                "Try adding the following points to the data and see how the model changes:",
-                                tags$ul(
-                                  tags$li("Point that is an outlier in (Medi) but not in (BVA)"), 
-                                  tags$li("Point that is an outlier in (BVA) but not in (Medi)"),
-                                  tags$li("An influential point")
-                                )
-                                 
+                             #   tags$br(),
+                             #   "Try adding the following points to the data and see how the model changes:",
+                             #   tags$ul(
+                             #     tags$li("Point that is an outlier in (Medi) but not in (BVA)"), 
+                             #     tags$li("Point that is an outlier in (BVA) but not in (Medi)"),
+                              #    tags$li("An influential point")
+                             #   ),
+                            actionButton("reset", label = "Remove all new points", class ="btn btn-primary btn-lg")
                             ),
                             
-                            
+                
                             # Show a plot of the generated model
                             mainPanel(
                               fluidRow(
                                 column(width = 12, 
-                                       br(),
-                                       p(tags$b("Click to add points to the scatterplot. As you add points, the model will be refit using the a data set that includes the original data and the newly added points."), style = "color: red"), 
+                             #          br()
                                 )
                               ),
-                              br(), 
+                             # br(), 
+                              h3(tags$b("Model fit using original data"), style = 'color: #0577B1'),
+                             withMathJax("$$\\what{BVA}= -1823.59	+ 1.01	\\times Medi$$"),
+                            #  htmlOutput("staticModel"),
                                 plotOutput("outlierGraph", click = "plot_click"),
-                                "Model using original observations",
-                                htmlOutput("staticModel"),
                                 tags$br(),
-                                tags$br(),
-                                "Model using original AND new observations",
+                                h3(tags$b("Model fit using original AND new data"), style = 'color: #0577B1'),
                                 htmlOutput("outlierModel"),
                                 verbatimTextOutput("clickInfo"),
-                                actionButton("reset", label = "Reset to Original"),
                                 tags$br()
                             ), fluid = TRUE
                         ) 
@@ -398,7 +388,7 @@ tabPanel("Resources",
            tags$br()
            
          )) # End of fluidRow
-   )# end of resources
+   ),# end of resources
 
 ## Feedback --------------------------------------------------------------------
 tabPanel("Feedback",
@@ -412,8 +402,6 @@ tabPanel("Feedback",
                      frameBorder="0")
 )
 
-
-)
 # tabPanel("Quiz",
 #          fluidRow(
 #            tags$iframe(src = "https://glenmorgenstern.shinyapps.io/OutlierQuiz/",
@@ -553,8 +541,8 @@ server <- function(input, output) {
     
     tab2Model %>%
         tidy(conf.int = TRUE) %>%
-        kable(format = "html", digits = 3) %>%
-        kableExtra::kable_styling("striped", full_width = F, font_size = 15)
+        kable(format = "html", digits = 3 ,  col.names = c("Term", "Estimate", "Std. Error", "Statistic", "P-value", "Conf. Low", "Conf. High")) %>%
+        kableExtra::kable_styling("striped", full_width = F, font_size = 20)
     
  
    
@@ -564,8 +552,8 @@ server <- function(input, output) {
       
       tab2Modelstatic %>%
         tidy(conf.int = TRUE) %>%
-        kable(format = "html", digits = 3) %>%
-        kableExtra::kable_styling("striped", full_width = F, font_size = 15)
+        kable(format = "html", digits = 3, col.names = c("Term", "Estimate", "Std. Error", "Statistic", "P-value", "Conf. Low", "Conf. High")) %>%
+        kableExtra::kable_styling("striped", full_width = F, font_size = 20)
     })
     #End of outlierModel code
     
