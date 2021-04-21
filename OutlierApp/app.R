@@ -248,11 +248,11 @@ ui <- navbarPage(
                                 )
                               ),
                              # br(), 
-                              h3(tags$b("Model fit using original data"), style = 'color: #0577B1'),
-                             withMathJax("$$\\what{BVA}= -1823.59	+ 1.01	\\times Medi$$"),
-                            #  htmlOutput("staticModel"),
-                                plotOutput("outlierGraph", click = "plot_click"),
-                                tags$br(),
+                            plotOutput("outlierGraph", click = "plot_click"),
+                            h3(tags$b("Model fit using original data"), style = 'color: #0577B1'),
+                            # withMathJax("$$\\what{BVA}= -1823.59	+ 1.01	\\times Medi$$"),
+                              htmlOutput("staticModel"),
+                           tags$br(),
                                 h3(tags$b("Model fit using original AND new data"), style = 'color: #0577B1'),
                                 htmlOutput("outlierModel"),
                                 verbatimTextOutput("clickInfo"),
@@ -264,9 +264,9 @@ ui <- navbarPage(
                tabPanel("Model Diagnostics",
                         sidebarLayout(
                             sidebarPanel(
-                                h4("Model Diagnostics"),
-                                "Toggle the radio buttons to learn how to calculate 
-                                  measures for outliers and what they mean.",
+                               # h4("Model Diagnostics"),
+                                p("Toggle the radio buttons to learn how to calculate 
+                                  measures for outliers and what they mean.", style = "color: red") ,
                                 tags$br(),
                                 tags$br(),
                                 radioButtons("measure",
@@ -319,27 +319,29 @@ ui <- navbarPage(
                )
                ), #end of third tab
                
-               tabPanel("Solutions for Outliers",
+               tabPanel("Approaches to deal with outliers",
                         sidebarLayout(
                             sidebarPanel(
-                                h4("Deal with Outliers"),
-                                "What should you do with your outliers? See whether the actions below are appropriate.",
+                                #h4("Deal with Outliers"),
+                                p("Below are a few common strategies used to deal with outliers. Click the check box next to each strategy to see the implications of using that approach"), 
                                 tags$br(),
                                 tags$br(),
-                                "**this data set is not the one used in previous tabs with added points**",
+                                p(tags$b("Note: This data set does not include any of the user added points."), style = "color: red"),
                                 tags$br(),
                                 tags$br(),
-                                checkboxGroupInput("solution",
+                                radioButtons("solution",
                                                    "Click to perform the indicated action on the model:",
                                                    choices = c("Remove middle income outlier",
                                                      "Remove high income outliers",
                                                      "Increase sample size",
-                                                     "Log transform y values")),
+                                                     "Log transform y values"), 
+                                             selected = character(0)
+                                             ),
                                 
                                   tags$br(),
-                                  tags$br(),
-                                  tags$b("Goal: "), "Learn acceptable methods to deal with outliers 
-                                        in a data set."
+                                  tags$br()
+                                #  tags$b("Goal: "), "Learn acceptable methods to deal with outliers 
+                                       # in a data set."
                             ),
                             
                             
@@ -348,9 +350,9 @@ ui <- navbarPage(
                                     "$R^{2}$ below:",
                                     verbatimTextOutput("solutionsR2"),
                                     tags$h4(
-                                        tags$b("Did I Choose a Reasonable Solution?")),
+                                        tags$b("Is this a resonable approach to deal with the outliers?")),
                                     wellPanel(htmlOutput("solutionsDescription", 
-                                                         style = "font-size: 17px")),
+                                                         style = "font-size: 20px")),
                                     tags$br()
                             )
                         )
@@ -392,14 +394,14 @@ tabPanel("Resources",
 
 ## Feedback --------------------------------------------------------------------
 tabPanel("Feedback",
-         style = "font-size: 20px",
-         
-         p("Use the form below to submit feedback about the app."), 
-         br(), br(),
-         
-         tags$iframe(src = "https://forms.office.com/Pages/ResponsePage.aspx?id=TsVyyzFKnk2xSh6jbfrJTBw0r2_bKCVMs9lST1_-2sxURDBLWjhPVzlUUTE4UVlUR1pVNzlZT0NZVi4u",
-                     width = "900", height = "400",
-                     frameBorder="0")
+         fluidRow(
+           column(12, 
+                  style = "font-size: 20px",
+                  
+                  h3(tags$a(href = "https://forms.office.com/Pages/ResponsePage.aspx?id=TsVyyzFKnk2xSh6jbfrJTBw0r2_bKCVMs9lST1_-2sxUOEZXQ0FGS0kwV0k3SzdYOVo0MVozQjVDTi4u", "Click here"), " to submit feedback about the app.")
+                  
+           )
+         )
 )
 
 # tabPanel("Quiz",
@@ -444,7 +446,9 @@ server <- function(input, output) {
             static <- ggplot(data=initialTab2, aes(x=medi, y=bva)) + geom_point() + 
                 labs(title = "Business Value Added vs. Median Income",
                      x = "Median Household Income (Medi)", y = "Business Value Added (BVA)") + 
-              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=bva), colour = "gray") + theme_bw() + theme(text = element_text(size=20))
+              geom_smooth(data = initialTab2, method = "lm", se = FALSE, aes(x=medi, y=bva), colour = "gray") + 
+              theme_bw() + 
+              theme(text = element_text(size=20))
         #this next line adds the new values on
             initialTab2 <- rbind.match.columns(initialTab2,values$DT) #combines reactive DF to initialTab2
              replot <- static + geom_point(data=values$DT, size = 2, aes(x=medi, y=bva), color = "red") +
@@ -697,15 +701,17 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                 geom_point() +
                 geom_hline(yintercept = leverageThresh, color = "red") +
-                geom_vline(xintercept = 27.5, color = "red")+
+                geom_vline(xintercept = 27.5, color = "blue", linetype = "dotted")+
                 labs(title = "Leverage by Observation",
                      x = "Observation Number",
                      y = "Leverage") + 
                 geom_text(aes(label = ifelse(.hat > leverageThresh,as.character(obs_num),"")),
                           position = position_nudge(y=0.005)) + 
                 scale_color_brewer(palette = "Dark2") + theme_bw() +
-              annotate("text", x = 15, y = 0.2302, label = "Outliers ABOVE red line")+
-              annotate("text", x=23, y = 0.13, label = "added points RIGHT of line")
+              annotate("text", x = 15, y = 0.23, label = "High leverage points above the line", size = 5)+
+              annotate("text", x=24, y = 0.13, label = "User added points right of line", size = 5) +
+              theme_bw() + 
+              theme(text = element_text(size=20))
         }
         if(input$measure == "standardizedResiduals") {
             measurePlot <- ggplot(data = initial_aug, aes(x = .fitted, y = .std.resid)) +
@@ -716,21 +722,27 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
                      x = "Predicted",
                      y = "Standard Residuals") + 
                 geom_text(aes(label = ifelse(abs(.std.resid) > 2,paste0("Obs. ", as.character(obs_num)),"")),
-                          position = position_nudge(y=0.2)) + 
+                          position = position_nudge(y=0.2), size = 5) + 
                 scale_color_brewer(palette = "Dark2") + theme_bw() +
-              annotate("text", x = 1000, y = c(2.2, -2.2), label = c("Outliers ABOVE this line", "Outliers BELOW this line"))
+              annotate("text", x = 1000, y = c(2.2, -2.2), label = c("Outliers above the line", "Outliers below the line"), 
+                       size = 5) +
+              theme_bw() + 
+              theme(text = element_text(size=20))
         }
         else if(input$measure == "cooksDistance"){
             measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .cooksd)) +
                 geom_point(alpha = 0.7) +
-                geom_hline(yintercept=1,color = "red") +
-                geom_vline(xintercept = 27.5, color = "red")+
+                geom_hline(yintercept=1,color = "red") + 
+                geom_hline(yintercept=0.5,color = "red", linetype = "dotted") +
+                geom_vline(xintercept = 27.5, color = "blue", linetype = "dotted")+
                 labs(x = "Observation Number", y = "Cook's Distance", title = "Cook's Distance") + 
                 geom_text(aes(label = ifelse(.cooksd > 1,paste0("Obs. ",as.character(obs_num)),"")),
                           position = position_nudge(y=0.1)) + 
                 scale_color_brewer(palette = "Dark2") + theme_bw() +
-              annotate("text", x = 15, y = 1.05, label = "Outliers ABOVE red line")+
-              annotate("text", x=23, y = 1.5, label = "added points RIGHT of line")
+              annotate("text", x = 15, y = 1.1, label = "Influential points above the line", size = 5)+
+              annotate("text", x=24, y = 1.9, label = "User added points right of line", size = 5) +
+              theme_bw() + 
+              theme(text = element_text(size=20))
         }
         
         measurePlot
@@ -754,136 +766,171 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         solnGraph = ggplot()
         if (is.null(input$solution)) {
             solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "(Unchanged) Value Added vs. Household Income", 
-                     x = "Median Household Income", y = "Business Value Added") + 
-                scale_color_brewer(palette = "Dark2") + xlim(0, 13000) + ylim(0, 16500)
+                geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+                labs(title = "Value Added vs. Household Income", 
+                     x = "Median Household Income", y = "Business Value Added", 
+                     color = "Outlier") + 
+                scale_color_brewer(palette = "Dark2") + xlim(0, 13000) + ylim(0, 16500) +
+              theme_bw() + 
+              theme(text = element_text(size=20)) 
+              
         }
         
+     
         med4     <- "Remove middle income outlier" %in% input$solution
         high4    <- "Remove high income outliers"  %in% input$solution
         sample4 <- "Increase sample size"  %in% input$solution
         logTrans <- "Log transform y values" %in% input$solution
         
-        if(med4 & high4 & sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000) + 
-                scale_color_brewer(palette = "Dark2")
-        }
-        else if (med4 & high4 & sample4){
-            solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 16500)+ 
-                scale_color_brewer(palette = "Dark2")
-        } 
-        else if (med4 & high4 & logTrans){
-            solnGraph <- ggplot(data = initial, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)+ 
-                scale_color_brewer(palette = "Dark2")
-        } 
-        else if (med4 & sample4 & logTrans){
-            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)+ 
-                scale_color_brewer(palette = "Dark2")
-        } 
-        else if (high4 & sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000) + 
-                scale_color_brewer(palette = "Dark2")
-        }  
-        else if (med4 & high4){
-            solnGraph <- ggplot(data = initial, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Value Added vs. Household Income", 
-                     x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 16500) + 
-                scale_color_brewer(palette = "Dark2")
-        } 
-        else if (med4 & logTrans){
-            solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)+ 
-                scale_color_brewer(palette = "Dark2")
-        } 
-        else if (med4 & sample4){
-            solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 16500)+ 
-                scale_color_brewer(palette = "Dark2")
-        } 
-        else if (high4 & sample4) {
-            solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Value Added vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Business Value Added") + 
-                xlim(0, 13000) + ylim(0, 16500)+ 
-                scale_color_brewer(palette = "Dark2")
-        }  
-        else if(high4 & logTrans) {
-            solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)+ 
-                scale_color_brewer(palette = "Dark2")
-        }
-        else if(sample4 & logTrans) {
-            solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
-                labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
-                     x = "Median Household Income", y = "Log(Business Value Added)") + 
-                xlim(0, 13000)+ 
-                scale_color_brewer(palette = "Dark2")
-        }
-        else if(med4) {
+        # if(med4 & high4 & sample4 & logTrans) {
+        #     solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000) + 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20))
+        # }
+        # else if (med4 & high4 & sample4){
+        #     solnGraph <- ggplot(data = largeSampleNoOutliers, aes(x = medi, y = bva, color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Value Added vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Business Value Added") + 
+        #         xlim(0, 13000) + ylim(0, 16500)+ 
+        #         scale_color_brewer(palette = "Dark2") + 
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # } 
+        # else if (med4 & high4 & logTrans){
+        #     solnGraph <- ggplot(data = initial, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # } 
+        # else if (med4 & sample4 & logTrans){
+        #     solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # } 
+        # else if (high4 & sample4 & logTrans) {
+        #     solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000) + 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # }  
+        # else if (med4 & high4){
+        #     solnGraph <- ggplot(data = initial, aes(x = medi, y = bva, color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Value Added vs. Household Income", 
+        #              x = "Median Household Income", y = "Business Value Added") + 
+        #         xlim(0, 13000) + ylim(0, 16500) + 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # } 
+        # else if (med4 & logTrans){
+        #     solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # } 
+        # else if (med4 & sample4){
+        #     solnGraph <- ggplot(data = largeSampleNoMed, aes(x = medi, y = bva, color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Value Added vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Business Value Added") + 
+        #         xlim(0, 13000) + ylim(0, 16500)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # } 
+        # else if (high4 & sample4) {
+        #     solnGraph <- ggplot(data = largeSampleNoHigh, aes(x = medi, y = bva, color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Value Added vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Business Value Added") + 
+        #         xlim(0, 13000) + ylim(0, 16500)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20))
+        # }  
+        # else if(high4 & logTrans) {
+        #     solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # }
+        # else if(sample4 & logTrans) {
+        #     solnGraph <- ggplot(data = largeSample, aes(x = medi, y = log(bva), color = outlier)) + 
+        #         geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+        #         labs(title = "Log(Value Added) vs. Household Income with Larger Sample", 
+        #              x = "Median Household Income", y = "Log(Business Value Added)") + 
+        #         xlim(0, 13000)+ 
+        #         scale_color_brewer(palette = "Dark2") +
+        #       theme_bw() + 
+        #       theme(text = element_text(size=20)) 
+        # }
+         if(med4) {
             solnGraph <- ggplot(data = noMedTab2, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+                geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
                 xlim(0, 13000) + ylim(0, 16500)+ 
-                scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2") +
+              theme_bw() + 
+              theme(text = element_text(size=20)) 
         }
         else if(high4) {
             solnGraph <- ggplot(data = noHighTab2, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+                geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income", 
                      x = "Median Household Income", y = "Business Value Added") + 
                 xlim(0, 13000) + ylim(0, 16500)+ 
-                scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2") +
+              theme_bw() + 
+              theme(text = element_text(size=20))  
         }
         else if(sample4) {
             solnGraph <- ggplot(data = largeSample, aes(x = medi, y = bva, color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+                geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Value Added vs. Household Income with Larger Sample", 
                      x = "Median Household Income", y = "Business Value Added") + 
                 xlim(0, 13000) + ylim(0, 16500)+ 
-                scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2") +
+              theme_bw() + 
+              theme(text = element_text(size=20)) 
         }
         else if(logTrans) {
             solnGraph <- ggplot(data = initialTab2, aes(x = medi, y = log(bva), color = outlier)) + 
-                geom_point() + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
+                geom_point(size = 3) + geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") + 
                 labs(title = "Log(Value Added) vs. Household Income", 
                      x = "Median Household Income", y = "Log(Business Value Added)") + 
                 xlim(0, 13000)+ 
-                scale_color_brewer(palette = "Dark2")
+                scale_color_brewer(palette = "Dark2") +
+              theme_bw() + 
+              theme(text = element_text(size=20)) 
         }
         
         solnGraph
@@ -903,122 +950,115 @@ measurePlot <- ggplot(data = initial_aug, aes(x = obs_num, y = .hat)) +
         sample4 <- "Increase sample size"  %in% input$solution
         logTrans <- "Log transform y values" %in% input$solution
         
-        if(med4 & high4 & sample4 & logTrans) {
-            correct <- "Not quite"
-            description <- ". Increasing sample size and log transformation are considered 
-            acceptable here, but removing an outlier because of an unusually high/low 
-            response variable is not acceptable. The medium income outlier is a legitimate 
-            observation. The log transformation corrects for the 'fan' that 
-            came with more observations, though it does make the model more complicated 
-            to interpret. Also note that with a larger sample size, the old high income outlier 
-            is no longer an outlier. No need to exclude it!"
-        }
-        else if (med4 & high4 & sample4){
-            correct <- "Not quite"
-            description <- ". Increasing sample size is considered 
-            acceptable here, but removing an outlier because of an unusually high/low 
-            response variable is NOT acceptable. The medium income outlier is a legitimate 
-            observation. Also note that with a larger sample size, the old high income outlier 
-            is no longer an outlier. No need to exclude it!"
-        } 
-        else if (med4 & high4 & logTrans){
-            correct <- "Not quite"
-            description <- ". A log transformation is acceptable here, but 
-            removing an outlier because of an unusually high/low response variable is 
-            NOT acceptable. The medium income outlier is a legitimate observation. Also 
-            note that the log transformation makes the model more complicated to interpret."
-        } 
-        else if (med4 & sample4 & logTrans){
-            correct <- "Not quite"
-            description <- ". Increasing sample size and log transformation are considered 
-            acceptable here, but removing an outlier because of an unusually high/low 
-            response variable is NOT acceptable. The medium income outlier is a legitimate 
-            observation. The log transformation corrects for the 'fan' that 
-            came with more observations, though it does make the model more complicated 
-            to interpret. Good job noting that with a larger sample size, the old high income outlier 
-            is no longer an outlier. No need to exclude it!"
-        } 
-        else if (high4 & sample4 & logTrans) {
-            correct <- "Almost"
-            description <- ". Increasing sample size and log transformation are considered 
-            acceptable here. Also, good job noting that the middle income outlier is a legitimate 
-            observation that you should keep. The log transformation corrects for the 'fan' that 
-            came with more observations, though it does make the model more complicated 
-            to interpret. Note that with a larger sample size, the 
-            old high income outlier is no longer an outlier. No need to exclude it!"
-        }  
-        else if (med4 & high4){
+        # if(med4 & high4 & sample4 & logTrans) {
+        #     correct <- "Not quite"
+        #     description <- ". Increasing sample size and log transformation are considered 
+        #     acceptable here, but removing an outlier because of an unusually high/low 
+        #     response variable is not acceptable. The medium income outlier is a legitimate 
+        #     observation. The log transformation corrects for the 'fan' that 
+        #     came with more observations, though it does make the model more complicated 
+        #     to interpret. Also note that with a larger sample size, the old high income outlier 
+        #     is no longer an outlier. No need to exclude it!"
+        # }
+        # else if (med4 & high4 & sample4){
+        #     correct <- "Not quite"
+        #     description <- ". Increasing sample size is considered 
+        #     acceptable here, but removing an outlier because of an unusually high/low 
+        #     response variable is NOT acceptable. The medium income outlier is a legitimate 
+        #     observation. Also note that with a larger sample size, the old high income outlier 
+        #     is no longer an outlier. No need to exclude it!"
+        # } 
+        # else if (med4 & high4 & logTrans){
+        #     correct <- "Not quite"
+        #     description <- ". A log transformation is acceptable here, but 
+        #     removing an outlier because of an unusually high/low response variable is 
+        #     NOT acceptable. The medium income outlier is a legitimate observation. Also 
+        #     note that the log transformation makes the model more complicated to interpret."
+        # } 
+        # else if (med4 & sample4 & logTrans){
+        #     correct <- "Not quite"
+        #     description <- ". Increasing sample size and log transformation are considered 
+        #     acceptable here, but removing an outlier because of an unusually high/low 
+        #     response variable is NOT acceptable. The medium income outlier is a legitimate 
+        #     observation. The log transformation corrects for the 'fan' that 
+        #     came with more observations, though it does make the model more complicated 
+        #     to interpret. Good job noting that with a larger sample size, the old high income outlier 
+        #     is no longer an outlier. No need to exclude it!"
+        # } 
+        # else if (high4 & sample4 & logTrans) {
+        #     correct <- "Almost"
+        #     description <- ". Increasing sample size and log transformation are considered 
+        #     acceptable here. Also, good job noting that the middle income outlier is a legitimate 
+        #     observation that you should keep. The log transformation corrects for the 'fan' that 
+        #     came with more observations, though it does make the model more complicated 
+        #     to interpret. Note that with a larger sample size, the 
+        #     old high income outlier is no longer an outlier. No need to exclude it!"
+        # }  
+        # else if (med4 & high4){
+        #     correct <- "No!"
+        #     description <- " There are better strategies than simply removing the outliers. 
+        #     Removing an outlier because of an unusually high/low response variable is NOT acceptable. 
+        #     The medium income outlier is a legitimate observation."
+        # } 
+        # else if (med4 & logTrans){
+        #     correct <- "No!"
+        #     description <- " The log transformation is considered 
+        #     acceptable here, but removing an outlier because of an unusually high/low 
+        #     response variable is NOT acceptable. The medium income outlier is a legitimate 
+        #     observation. However, removing an outlier because of unusual values in a 
+        #     predictor variable is acceptable, though the predictive range of the model 
+        #     will diminish. Also note that the log transformation makes the model 
+        #     more complicated to interpret."
+        # } 
+        # else if (med4 & sample4){
+        #     correct <- "No!"
+        #     description <- " Increasing sample size is considered 
+        #     acceptable here, but removing an outlier because of an unusually high/low 
+        #     response variable is NOT acceptable. The medium income outlier is a legitimate 
+        #     observation. However, removing an outlier because of unusual values in a 
+        #     predictor variable is acceptable, though the predictive range of the model 
+        #     will diminish."
+        # } 
+        # else if (high4 & sample4) {
+        #     correct <- "Almost"
+        #     description <- ". Increasing sample size was a good idea, but 
+        #     note that with a larger sample size, the old high income outlier is 
+        #     no longer an outlier. No need to exclude it!"
+        # }  
+        # else if(high4 & logTrans) {
+        #     correct <- "Yes"
+        #     description <- ", this is an acceptable solution! If for some reason, 
+        #     you cannot increase sample size, try a log transformation. Note that the log 
+        #     transformation makes the model more complicated to interpret. Removing 
+        #     outliers with unusually high or low values in a predictor variable is 
+        #     acceptable. Good job! Now, try to find the other acceptable solutions."
+        # }
+        # else if(sample4 & logTrans) {
+        #     correct <- "Yes"
+        #     description <- ", this is a reasonable solution. Good job seeing 
+        #     that with a larger sample size, the old high income outlier is no 
+        #     longer an outlier. The log transformation corrects for the 'fan' that 
+        #     came with more observations, though it does make the model more complicated 
+        #     to interpret. Try to find the other acceptable solutions."
+        # }
+         if(med4) {
             correct <- "No!"
-            description <- " There are better strategies than simply removing the outliers. 
-            Removing an outlier because of an unusually high/low response variable is NOT acceptable. 
-            The medium income outlier is a legitimate observation."
-        } 
-        else if (med4 & logTrans){
-            correct <- "No!"
-            description <- " The log transformation is considered 
-            acceptable here, but removing an outlier because of an unusually high/low 
-            response variable is NOT acceptable. The medium income outlier is a legitimate 
-            observation. However, removing an outlier because of unusual values in a 
-            predictor variable is acceptable, though the predictive range of the model 
-            will diminish. Also note that the log transformation makes the model 
-            more complicated to interpret."
-        } 
-        else if (med4 & sample4){
-            correct <- "No!"
-            description <- " Increasing sample size is considered 
-            acceptable here, but removing an outlier because of an unusually high/low 
-            response variable is NOT acceptable. The medium income outlier is a legitimate 
-            observation. However, removing an outlier because of unusual values in a 
-            predictor variable is acceptable, though the predictive range of the model 
-            will diminish."
-        } 
-        else if (high4 & sample4) {
-            correct <- "Almost"
-            description <- ". Increasing sample size was a good idea, but 
-            note that with a larger sample size, the old high income outlier is 
-            no longer an outlier. No need to exclude it!"
-        }  
-        else if(high4 & logTrans) {
-            correct <- "Yes"
-            description <- ", this is an acceptable solution! If for some reason, 
-            you cannot increase sample size, try a log transformation. Note that the log 
-            transformation makes the model more complicated to interpret. Removing 
-            outliers with unusually high or low values in a predictor variable is 
-            acceptable. Good job! Now, try to find the other acceptable solutions."
-        }
-        else if(sample4 & logTrans) {
-            correct <- "Yes"
-            description <- ", this is a reasonable solution. Good job seeing 
-            that with a larger sample size, the old high income outlier is no 
-            longer an outlier. The log transformation corrects for the 'fan' that 
-            came with more observations, though it does make the model more complicated 
-            to interpret. Try to find the other acceptable solutions."
-        }
-        else if(med4) {
-            correct <- "No!"
-            description <- " Removing an outlier because of an unusually high/low 
-            response variable is NOT acceptable. The medium income outlier is a legitimate 
-            observation. However, removing an outlier because of unusual values in a 
-            predictor variable is acceptable, though the predictive range of the model 
-            will diminish."
+            description <- "(In most cases)We should avoid removing an observation that has an unusual value of the repsonse variable, since it could be a legitimate observation. 
+            You can go back to the original data and subject matter experts to determine if this is an legitimate though unusal observation or if it is a data entry error. If it is the latter, you can remove it from the data set."
+          
         }
         else if(high4) {
             correct <- "Yes"
-            description <- ", this is considered acceptable. Removing an outlier because 
-            of unusual values in a predictor variable is acceptable, though the predictive 
-            range of the model will diminish. There are better solutions available, though. 
-            Try to find them."
+            description <- ". You can remove observations with high leverage points, i.e. outliers in one or a combination of predictor variables, however this does limit the scope of the analysis and predictions from the model." 
+          
         }
         else if(sample4) {
             correct <- "Almost"
-            description <- ". Increasing sample size was a good idea because 
-            your old high income outliers are no longer outliers. However, there is 
-            now a 'fan' pattern in the data. What method might correct this?"
+            description <- ". While this will can help us get more data, and thus determine if these are truly outliers, it is often difficult to collect more data in practice."
         }
         else if(logTrans) {
-            correct <- "Yes"
-            description <- ", this is an acceptable solution. The log transformation 
-            helps account for the outliers. However, the model does become more complicated 
+            correct <- "No!"
+            description <- ". This is not the best solution. The log transformation helped deal with some issues with outliers; however, the model does become more complicated 
             to interpret. There are even better solutions! Try to 
             find them."
         }
