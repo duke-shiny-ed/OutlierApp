@@ -390,19 +390,19 @@ tabPanel("Resources",
            tags$br()
            
          )) # End of fluidRow
-   ),# end of resources
+   )# end of resources
 
 ## Feedback --------------------------------------------------------------------
-tabPanel("Feedback",
-         fluidRow(
-           column(12, 
-                  style = "font-size: 20px",
-                  
-                  h3(tags$a(href = "https://forms.office.com/Pages/ResponsePage.aspx?id=TsVyyzFKnk2xSh6jbfrJTBw0r2_bKCVMs9lST1_-2sxUOEZXQ0FGS0kwV0k3SzdYOVo0MVozQjVDTi4u", "Click here"), " to submit feedback about the app.")
-                  
-           )
-         )
-)
+# tabPanel("Feedback",
+#          fluidRow(
+#            column(12, 
+#                   style = "font-size: 20px",
+#                   
+#                   h3(tags$a(href = "https://forms.office.com/Pages/ResponsePage.aspx?id=TsVyyzFKnk2xSh6jbfrJTBw0r2_bKCVMs9lST1_-2sxUOEZXQ0FGS0kwV0k3SzdYOVo0MVozQjVDTi4u", "Click here"), " to submit feedback about the app.")
+#                   
+#            )
+#          )
+# )
 
 # tabPanel("Quiz",
 #          fluidRow(
